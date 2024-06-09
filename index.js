@@ -9,7 +9,7 @@ var { createNoise2D } = require('simplex-noise');
 
 var Player = require('./player').Player;
 
-const tickRate = 1000/20
+const tickRate = 1000/20;
 
 var V = SAT.Vector;
 
@@ -85,21 +85,21 @@ function updateMovement() {
 
         if (!player) continue; // Ensure player exists in gameState
 
-        let rotationSpeed = 0.1; // Adjust the rotation speed as needed
+        let rotationSpeed = 0.5; // Adjust the rotation speed as needed
         if (playerMovement.left) {
-            player.x -= 4;
+            player.x -= player.moveSpeed;
             player.angle = rLerp(player.angle, Math.PI, rotationSpeed); // Rotate left
         }
         if (playerMovement.right) {
-            player.x += 4;
+            player.x += player.moveSpeed;
             player.angle = rLerp(player.angle, 0, rotationSpeed); // Rotate right
         }
         if (playerMovement.up) {
-            player.y -= 4;
+            player.y -= player.moveSpeed;
             player.angle = rLerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
         }
         if (playerMovement.down) {
-            player.y += 4;
+            player.y += player.moveSpeed;
             player.angle = rLerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
         }
         if (playerMovement.mouseAngle) {

@@ -3,7 +3,7 @@ let gameState = null;
 let prevState = null;
 let lastTick = null;
 const tileSize = 50;
-const tickRate = 1000/20
+const tickRate = 1000/20;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);

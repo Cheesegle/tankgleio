@@ -5,6 +5,7 @@ class Player {
         this.turretBaseSide = 19;
         this.turretNozzleWidth = 21;
         this.turretNozzleHeight = 10;
+        this.moveSpeed = 8;
 
         this.x = x;
         this.y = y;

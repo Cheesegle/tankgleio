@@ -18,6 +18,7 @@ let scaledHeight;
 let scalingFactor = 1500;
 const maxScalingFactor = 3000;
 const minScalingFactor = 1000;
+let targetScalingFactor = scalingFactor;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -94,6 +95,8 @@ function draw() {
 
     // Clear the canvas
     clear();
+
+    updateZoom();
 
     // Apply scaling
     scale(windowWidth / scalingFactor);
@@ -219,11 +222,19 @@ function drawPlayer(player, playerId) {
     }
 }
 
+function updateZoom() {
+    // Interpolate towards the target scaling factor
+    scalingFactor = lerp(scalingFactor, targetScalingFactor, 0.1); // Adjust the interpolation factor (0.1) for the desired smoothness
+
+    // Clamp the scaling factor within the specified range
+    scalingFactor = constrain(scalingFactor, minScalingFactor, maxScalingFactor);
+}
+
 function mouseWheel(event) {
     if (event.delta > 0) {
-        scalingFactor = Math.min(scalingFactor + 100, maxScalingFactor); // Increase scaling factor but clamp to maxScalingFactor
+        targetScalingFactor = Math.min(targetScalingFactor + 100, maxScalingFactor); // Increase target scaling factor but clamp to maxScalingFactor
     } else {
-        scalingFactor = Math.max(scalingFactor - 100, minScalingFactor); // Decrease scaling factor but clamp to minScalingFactor
+        targetScalingFactor = Math.max(targetScalingFactor - 100, minScalingFactor); // Decrease target scaling factor but clamp to minScalingFactor
     }
 }
 

@@ -15,7 +15,9 @@ let username = '';
 let customFont;
 let scaledWidth;
 let scaledHeight;
-
+let scalingFactor = 1500;
+const maxScalingFactor = 3000;
+const minScalingFactor = 1000;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -94,11 +96,11 @@ function draw() {
     clear();
 
     // Apply scaling
-    scale(windowWidth / 1000);
+    scale(windowWidth / scalingFactor);
 
     // Calculate scaled canvas dimensions
-    scaledWidth = windowWidth / (windowWidth / 1000);
-    scaledHeight = windowHeight / (windowWidth / 1000);
+    scaledWidth = windowWidth / (windowWidth / scalingFactor);
+    scaledHeight = windowHeight / (windowWidth / scalingFactor);
 
     background('#D8B077');
 
@@ -214,6 +216,14 @@ function drawPlayer(player, playerId) {
         textAlign(CENTER);
         text(player.username, tank.x + tank.width / 2, tank.y - 25); // Display the username above the tank
         pop();
+    }
+}
+
+function mouseWheel(event) {
+    if (event.delta > 0) {
+        scalingFactor = Math.min(scalingFactor + 100, maxScalingFactor); // Increase scaling factor but clamp to maxScalingFactor
+    } else {
+        scalingFactor = Math.max(scalingFactor - 100, minScalingFactor); // Decrease scaling factor but clamp to minScalingFactor
     }
 }
 

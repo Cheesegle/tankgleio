@@ -31,23 +31,39 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
 
         if (!player) continue; // Ensure player exists in gameState
 
-        let rotationSpeed = 0.5; // Adjust the rotation speed as needed
+        let rotationSpeed = 0.3; // Adjust the rotation speed as needed
+
+        // Calculate the movement direction based on the player's inputs
+        let movementDirection = { x: 0, y: 0 };
         if (playerMovement.left) {
-            player.x -= player.moveSpeed;
+            movementDirection.x -= player.moveSpeed;
             player.angle = rLerp(player.angle, Math.PI, rotationSpeed); // Rotate left
         }
         if (playerMovement.right) {
-            player.x += player.moveSpeed;
+            movementDirection.x += player.moveSpeed;
             player.angle = rLerp(player.angle, 0, rotationSpeed); // Rotate right
         }
         if (playerMovement.up) {
-            player.y -= player.moveSpeed;
+            movementDirection.y -= player.moveSpeed;
             player.angle = rLerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
         }
         if (playerMovement.down) {
-            player.y += player.moveSpeed;
+            movementDirection.y += player.moveSpeed;
             player.angle = rLerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
         }
+
+        // Normalize the movement vector if moving diagonally
+        let movementMagnitude = Math.sqrt(movementDirection.x ** 2 + movementDirection.y ** 2);
+        if (movementMagnitude > player.moveSpeed) {
+            let factor = player.moveSpeed / movementMagnitude;
+            movementDirection.x *= factor;
+            movementDirection.y *= factor;
+        }
+
+        // Apply the movement
+        player.x += movementDirection.x;
+        player.y += movementDirection.y;
+
         if (playerMovement.mouseAngle) {
             player.turretAngle = playerMovement.mouseAngle;
         }
@@ -67,6 +83,7 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
     }
     movementQueue = {}; // Clear the movement queue after processing
 };
+
 
 
 // Function to check collision between a bullet and a player

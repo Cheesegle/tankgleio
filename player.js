@@ -10,7 +10,7 @@ class Player {
         this.height = 33;
         this.hitboxWidth = 38;
         this.hitboxHeight = 38;
-        this.moveSpeed = 8;
+        this.moveSpeed = 10;
         this.maxHealth = 100;
         this.health = this.maxHealth;
         this.bullets = [];

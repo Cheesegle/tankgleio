@@ -117,11 +117,11 @@ function draw() {
         }
     }
 
-    // Update camera position
+    // Update camera position with lerping
     playerCameraX = lerp(playerCameraX, lerpedPlayerX - scaledWidth / 2, cameraLerpAmount);
     playerCameraY = lerp(playerCameraY, lerpedPlayerY - scaledHeight / 2, cameraLerpAmount);
 
-    // Translate canvas to follow player
+    // Translate canvas to follow player with interpolated camera position
     translate(-playerCameraX, -playerCameraY);
 
     // Render tiles
@@ -224,7 +224,7 @@ function drawPlayer(player, playerId) {
 
 function updateZoom() {
     // Interpolate towards the target scaling factor
-    scalingFactor = lerp(scalingFactor, targetScalingFactor, 0.1); // Adjust the interpolation factor (0.1) for the desired smoothness
+    scalingFactor = lerp(scalingFactor, targetScalingFactor, 0.01); // Adjust the interpolation factor (0.1) for the desired smoothness
 
     // Clamp the scaling factor within the specified range
     scalingFactor = constrain(scalingFactor, minScalingFactor, maxScalingFactor);

@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
 
     socket.on('playerMovement', (playerMovement) => {
         //Someone Moved!
-        const player = gameState.players[socket.id];
+        let player = gameState.players[socket.id];
 
         if (!player) return; // Ensure player exists in gameState
 

@@ -9,6 +9,7 @@ var { createNoise2D } = require('simplex-noise');
 
 var Player = require('./player').Player;
 
+const tickRate = 1000/20
 
 var V = SAT.Vector;
 
@@ -146,7 +147,7 @@ io.on('connection', (socket) => {
 setInterval(() => {
     updateMovement();
     io.sockets.emit('state', gameState);
-}, 1000 / 60);
+}, tickRate);
 
 //Start the server on port 3000
 http.listen(3000, () => {

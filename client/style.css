@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'Poppins-Bold';
+    src: url('fonts/Poppins-Bold.ttf') format('truetype');
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Poppins-Bold', sans-serif;
+    background-color: #D8B077;
+}
+
+#startMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    /* Hide by default */
+}
+
+#startMenu input,
+#startMenu button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 20px;
+    font-family: 'Poppins-Bold', sans-serif;
+}

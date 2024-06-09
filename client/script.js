@@ -2,8 +2,14 @@ let socket;
 let gameState = null;
 let prevState = null;
 let lastTick = null;
+let lastTickDiff = null;
 const tileSize = 50;
-const tickRate = 1000/20;
+const tickRate = 1000 / 20;
+let playerCameraX = 0;
+let playerCameraY = 0;
+let lerpedPlayerX = 0;
+let lerpedPlayerY = 0;
+const cameraLerpAmount = 0.05;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -27,13 +33,29 @@ function setup() {
         lastTick = performance.now();
         prevState = gameState;
         gameState = state;
-
     });
 }
 
 function draw() {
     // Clear the canvas
     clear();
+
+    lastTickDiff = (performance.now() - lastTick) / tickRate;
+
+    // Update lerped player position
+    if (gameState && gameState.players && prevState) {
+        if (gameState.players[socket.id] && prevState.players[socket.id]) {
+            lerpedPlayerX = lerp(prevState.players[socket.id].x, gameState.players[socket.id].x, lastTickDiff);
+            lerpedPlayerY = lerp(prevState.players[socket.id].y, gameState.players[socket.id].y, lastTickDiff);
+        }
+    }
+
+    // Update camera position
+    playerCameraX = lerp(playerCameraX, lerpedPlayerX - width / 2, 0.01);
+    playerCameraY = lerp(playerCameraY, lerpedPlayerY - height / 2, 0.01);
+
+    // Translate canvas to follow player
+    translate(-playerCameraX, -playerCameraY);
 
     // Render tiles
     if (gameState && gameState.tiles) {
@@ -54,21 +76,23 @@ function draw() {
             drawPlayer(player, playerId);
         }
     }
+
 }
 
 // Draw a player tank
 function drawPlayer(player, playerId) {
-    let lastTickDiff = (performance.now() - lastTick) / tickRate;
-    let tank = new Tank(
-        lerp(prevState.players[playerId].x, player.x, lastTickDiff),
-        lerp(prevState.players[playerId].y, player.y, lastTickDiff),
-        rLerp(prevState.players[playerId].angle, player.angle, lastTickDiff),
-        rLerp(prevState.players[playerId].turretAngle, player.turretAngle, lastTickDiff),
-        player.color,
-        player.turretColor,
-        player.sideColor
-    );
-    tank.render();
+    if (prevState && prevState.players && prevState.players[playerId]) {
+        let tank = new Tank(
+            lerp(prevState.players[playerId].x, player.x, lastTickDiff),
+            lerp(prevState.players[playerId].y, player.y, lastTickDiff),
+            rLerp(prevState.players[playerId].angle, player.angle, lastTickDiff),
+            rLerp(prevState.players[playerId].turretAngle, player.turretAngle, lastTickDiff),
+            player.color,
+            player.turretColor,
+            player.sideColor
+        );
+        tank.render();
+    }
 }
 
 // Handle window resize

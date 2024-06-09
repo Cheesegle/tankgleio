@@ -9,7 +9,7 @@ let playerCameraX = 0;
 let playerCameraY = 0;
 let lerpedPlayerX = 0;
 let lerpedPlayerY = 0;
-const cameraLerpAmount = 0.05;
+const cameraLerpAmount = 0.07;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);

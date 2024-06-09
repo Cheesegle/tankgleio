@@ -16,6 +16,13 @@ class Player {
         this.bullets = [];
         this.id = id;
     }
+
+    respawn(spawnLocations) {
+        let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
+        this.x = spawnLocation.x;
+        this.y = spawnLocation.y;
+        this.health = this.maxHealth;
+    }
 }
 
 module.exports = Player;

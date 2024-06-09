@@ -26,17 +26,30 @@ const gameState = {
     tiles: gameMap
 };
 
-const spawnLocations = [
-    { x: 250, y: 250 },
-    { x: 250, y: 500 }
-];
+const getRandomEmptyLocation = () => {
+    const emptyLocations = [];
+    for (let i = 0; i < gameMap.length; i++) {
+        for (let j = 0; j < gameMap[i].length; j++) {
+            if (gameMap[i][j] === 0) {
+                // If the tile is empty, add its coordinates to the list of empty locations
+                emptyLocations.push({ x: j * tileSize, y: i * tileSize });
+            }
+        }
+    }
+    // Choose a random empty location from the list
+    return emptyLocations[Math.floor(Math.random() * emptyLocations.length)];
+};
+
+var spawnLocations = [];
+// Generate 20 random spawn locations
+for (let i = 0; i < 20; i++) {
+    spawnLocations.push(getRandomEmptyLocation());
+}
 
 let movementQueue = {}; // Object to store movement updates
 
-
 // Store the last shooting time for each player
-var lastShotTimes = {};
-
+const lastShotTimes = {};
 
 io.on('connection', (socket) => {
     socket.on('newPlayer', () => {
@@ -58,8 +71,7 @@ io.on('connection', (socket) => {
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastShotTime >= shootCooldown) {
-                const bulletSpeed = 10; // Adjust speed as needed
-                const bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.turretAngle, bulletSpeed, player.id);
+                const bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.turretAngle, player.id);
                 gameState.bullets.push(bullet);
 
                 // Update the last shot time for the player
@@ -77,9 +89,19 @@ io.on('connection', (socket) => {
     });
 });
 
+function updatePlayers() {
+    for(const playerId in gameState.players){
+        let player = gameState.players[playerId];
+        if(player.health <= 0){
+            player.respawn(spawnLocations);
+        }
+    }
+}
+
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
     updateBullets(gameState, gameMap, tileSize);
+    updatePlayers();
     io.sockets.emit('state', gameState);
 }, tickRate);
 

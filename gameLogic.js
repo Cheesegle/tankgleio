@@ -78,8 +78,7 @@ const checkBulletPlayerCollision = (bullet, player) => {
     const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
 
     if (collided && bullet.owner !== player.id) {
-        // Apply damage to the player, remove the bullet, etc.
-        // For now, let's just mark the bullet for removal
+        player.health -= 50;
         return true;
     }
 

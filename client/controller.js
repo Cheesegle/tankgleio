@@ -49,7 +49,6 @@ function mouseMoved() {
             const mouseYPos = ((mouseY / windowHeight) * scaledHeight) + playerCameraY;
             const tankX = gameState.players[socket.id].x; // Assuming the tank's x position is stored in gameState
             const tankY = gameState.players[socket.id].y; // Assuming the tank's y position is stored in gameState
-            ellipse(mouseXPos, mouseYPos, 20, 20)
             const angle = Math.atan2(mouseYPos - tankY, mouseXPos - tankX);
             playerMovement.mouseAngle = angle;
         }

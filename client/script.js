@@ -1,5 +1,6 @@
 let socket;
 let gameState = null;
+let tileSize = 50;
 
 function setup() {
     // Initialize socket.io
@@ -22,8 +23,20 @@ function draw() {
     // Clear the canvas
     clear();
 
+    // Render tiles
+    if (gameState && gameState.tiles) {
+        for (let i = 0; i < gameState.tiles.length; i++) {
+            for (let j = 0; j < gameState.tiles[i].length; j++) {
+                if (gameState.tiles[i][j] === 1) {
+                    fill(100); // Example tile color
+                    rect(j * tileSize, i * tileSize, tileSize, tileSize);
+                }
+            }
+        }
+    }
+
     // Draw the players that the server sent
-    if (gameState) {
+    if (gameState && gameState.players) {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
             drawPlayer(player);

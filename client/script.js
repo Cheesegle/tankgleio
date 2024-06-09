@@ -40,6 +40,8 @@ function draw() {
     // Clear the canvas
     clear();
 
+    background('#D8B077');
+
     lastTickDiff = (performance.now() - lastTick) / tickRate;
 
     // Update lerped player position
@@ -62,8 +64,11 @@ function draw() {
         for (let i = 0; i < gameState.tiles.length; i++) {
             for (let j = 0; j < gameState.tiles[i].length; j++) {
                 if (gameState.tiles[i][j] === 1) {
+                    push();
                     fill(100); // Example tile color
+                    strokeWeight(2);
                     rect(j * tileSize, i * tileSize, tileSize, tileSize);
+                    pop();
                 }
             }
         }
@@ -77,6 +82,40 @@ function draw() {
         }
     }
 
+    // Draw bullets
+    if (gameState && gameState.bullets) {
+        for (let i = 0; i < gameState.bullets.length; i++) {
+            let bullet = gameState.bullets[i];
+            drawBullet(bullet);
+        }
+    }
+}
+
+// Draw a bullet with linear interpolation
+function drawBullet(bullet) {
+    if (prevState && prevState.bullets) {
+        for (let i = 0; i < prevState.bullets.length; i++) {
+            if (prevState.bullets[i].id === bullet.id) {
+                const prevBullet = prevState.bullets[i];
+                const lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
+                const lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
+                push();
+                fill('yellow'); // Example bullet color
+                ellipse(lerpedX, lerpedY, bullet.width, bullet.height);
+                pop();
+                return; // Exit the loop once the bullet is found
+            }
+        }
+    }
+    // If no previous state or matching bullet found, draw bullet without interpolation
+    push();
+    fill('yellow');
+    ellipse(bullet.x, bullet.y, bullet.width, bullet.height);
+    pop();
+}
+
+function mouseClicked() {
+    socket.emit('shoot')
 }
 
 // Draw a player tank
@@ -89,7 +128,8 @@ function drawPlayer(player, playerId) {
             rLerp(prevState.players[playerId].turretAngle, player.turretAngle, lastTickDiff),
             player.color,
             player.turretColor,
-            player.sideColor
+            player.width,
+            player.height
         );
         tank.render();
     }

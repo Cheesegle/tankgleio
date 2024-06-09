@@ -1,19 +1,21 @@
 class Player {
-    constructor(x, y, angle, turretAngle, color, turretColor) {
+    constructor(x, y, angle, turretAngle, color, turretColor, id) {
+        this.x = x || 0;
+        this.y = y || 0;
+        this.angle = angle || 0;
+        this.turretAngle = turretAngle || 0;
+        this.color = color || 'red';
+        this.turretColor = turretColor || 'gray';
         this.width = 43;
         this.height = 33;
-        this.turretBaseSide = 19;
-        this.turretNozzleWidth = 21;
-        this.turretNozzleHeight = 10;
+        this.hitboxWidth = 38;
+        this.hitboxHeight = 38;
         this.moveSpeed = 8;
-
-        this.x = x;
-        this.y = y;
-        this.angle = angle;
-        this.turretAngle = turretAngle;
-        this.color = color;
-        this.turretColor = turretColor;
-        this.dead = false;
+        this.maxHealth = 100;
+        this.health = this.maxHealth;
+        this.bullets = [];
+        this.id = id;
     }
 }
-module.exports.Player = Player;
+
+module.exports = Player;

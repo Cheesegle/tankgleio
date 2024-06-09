@@ -39,23 +39,22 @@ io.on('connection', (socket) => {
 
         if (!player) return; // Ensure player exists in gameState
 
-        // Use the object to move the player's coordinates
-        let rotationSpeed = 0.05; // Adjust the rotation speed as needed
+        let rotationSpeed = 0.1;
         if (playerMovement.left) {
             player.x -= 4;
-            player.angle = lerp(player.angle, Math.PI, rotationSpeed); // Rotate left
+            player.angle = lerp(player.angle, Math.PI, rotationSpeed);
         }
         if (playerMovement.right) {
             player.x += 4;
-            player.angle = lerp(player.angle, 0, rotationSpeed); // Rotate right
+            player.angle = lerp(player.angle, 0, rotationSpeed);
         }
         if (playerMovement.up) {
             player.y -= 4;
-            player.angle = lerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
+            player.angle = lerp(player.angle, -Math.PI / 2, rotationSpeed);
         }
         if (playerMovement.down) {
             player.y += 4;
-            player.angle = lerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
+            player.angle = lerp(player.angle, Math.PI / 2, rotationSpeed);
         }
         if (playerMovement.angle) {
             player.turretAngle = playerMovement.angle;

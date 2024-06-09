@@ -119,8 +119,12 @@ function drawBullet(bullet) {
                 const lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
                 const lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
                 push();
-                fill('white'); // Example bullet color
-                ellipse(lerpedX, lerpedY, bullet.width, bullet.height);
+                if(bullet.owner === socket.id){
+                    fill('green');
+                } else {
+                    fill('red');
+                }
+                ellipse(lerpedX, lerpedY, bullet.size, bullet.size);
                 pop();
                 return; // Exit the loop once the bullet is found
             }
@@ -129,7 +133,7 @@ function drawBullet(bullet) {
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();
     fill('yellow');
-    ellipse(bullet.x, bullet.y, bullet.width, bullet.height);
+    ellipse(bullet.x, bullet.y, bullet.size, bullet.size);
     pop();
 }
 

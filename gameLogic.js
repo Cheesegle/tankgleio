@@ -71,7 +71,7 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
 
 // Function to check collision between a bullet and a player
 const checkBulletPlayerCollision = (bullet, player) => {
-    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.width / 2);
+    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
     let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
 
     const response = new SAT.Response();
@@ -88,23 +88,32 @@ const checkBulletPlayerCollision = (bullet, player) => {
 
 // Function to check collision between a bullet and a tile
 const checkBulletTileCollision = (bullet, tile) => {
-    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.width / 2);
+    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
     const tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tile.width, tile.height).toPolygon();
 
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, tileRect, response);
 
+    if (collided) {
+        // Reflect the bullet's velocity vector
+        const normal = response.overlapN;
+        const dot = bullet.vx * normal.x + bullet.vy * normal.y;
+        bullet.vx -= 2 * dot * normal.x;
+        bullet.vy -= 2 * dot * normal.y;
+    }
+
     return collided;
 };
+
 
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
 
     for (let i = 0; i < gameState.bullets.length; i++) {
-        const bullet = gameState.bullets[i];
-        // Update bullet position based on angle and speed
-        bullet.x += Math.cos(bullet.angle) * bullet.speed;
-        bullet.y += Math.sin(bullet.angle) * bullet.speed;
+        let bullet = gameState.bullets[i];
+        //update bullet position
+        bullet.x += bullet.vx * bullet.speed;
+        bullet.y += bullet.vy * bullet.speed;
 
         // Check collision with players
         for (const playerId in gameState.players) {
@@ -126,7 +135,10 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                         height: tileSize
                     };
                     if (checkBulletTileCollision(bullet, tile)) {
-                        bulletsToRemove.push(i);
+                        if (bullet.bounces <= 0) {
+                            bulletsToRemove.push(i);
+                        }
+                        bullet.bounces -= 1;
                         break; // Exit the loop if bullet collided with a tile
                     }
                 }
@@ -145,6 +157,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
         gameState.bullets.splice(bulletsToRemove[i], 1);
     }
 };
+
 
 module.exports = {
     updateMovement,

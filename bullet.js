@@ -1,16 +1,17 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Bullet {
-    constructor(x, y, angle, owner) {
+    constructor(x, y, vx, vy, owner) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
-        this.angle = angle;
+        this.vx = vx;
+        this.vy = vy;
         this.speed = 20;
-        this.width = 10; // Assuming default bullet width
-        this.height = 10; // Assuming default bullet height
+        this.size = 10; // Assuming default bullet width
         this.owner = owner;
-        this.damage = 50;
+        this.damage = 100;
+        this.bounces = 3;
     }
 
     move() {

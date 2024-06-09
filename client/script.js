@@ -19,6 +19,7 @@ let scalingFactor = 1500;
 const maxScalingFactor = 3000;
 const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
+let tiles = [];
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -58,6 +59,10 @@ function setup() {
 
     socket.on('blip', (state) => {
         blipSound.play();
+    });
+
+    socket.on('map', (serverTiles) => {
+        tiles = serverTiles;
     });
 
     // Listen to the server and draw the players
@@ -125,10 +130,10 @@ function draw() {
     translate(-playerCameraX, -playerCameraY);
 
     // Render tiles
-    if (gameState && gameState.tiles) {
-        for (let i = 0; i < gameState.tiles.length; i++) {
-            for (let j = 0; j < gameState.tiles[i].length; j++) {
-                if (gameState.tiles[i][j] === 1) {
+    if (gameState && tiles) {
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                if (tiles[i][j] === 1) {
                     push();
                     fill(100); // Example tile color
                     strokeWeight(2);

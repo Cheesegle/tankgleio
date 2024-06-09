@@ -57,8 +57,8 @@ io.on('connection', (socket) => {
             player.y += 4;
             player.angle = lerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
         }
-        if (playerMovement.angle) {
-            player.turretAngle = playerMovement.angle;
+        if (playerMovement.mouseAngle) {
+            player.turretAngle = playerMovement.mouseAngle;
         }
     })
 

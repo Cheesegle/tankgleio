@@ -71,6 +71,7 @@ io.on('connection', (socket) => {
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastShotTime >= shootCooldown) {
+                io.emit('shot');
                 const bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.turretAngle, player.id);
                 gameState.bullets.push(bullet);
 
@@ -78,7 +79,7 @@ io.on('connection', (socket) => {
                 lastShotTimes[socket.id] = currentTime;
             } else {
                 // Handle case where the player is still on cooldown
-                socket.emit('shootCooldown');
+                socket.emit('blip');
             }
         }
     });
@@ -94,6 +95,7 @@ function updatePlayers() {
         let player = gameState.players[playerId];
         if(player.health <= 0){
             player.respawn(spawnLocations);
+            io.emit('explode');
         }
     }
 }

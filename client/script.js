@@ -17,6 +17,13 @@ function rLerp(A, B, w) {
     return Math.atan2(SN, CS);
 }
 
+function preload() {
+    // Load sound files
+    shootSound = loadSound('shoot.wav');
+    explodeSound = loadSound('explosion.wav');
+    blipSound = loadSound('blip.wav');
+}
+
 function setup() {
     // Initialize socket.io
     socket = io();
@@ -26,6 +33,18 @@ function setup() {
 
     // Join the game
     socket.emit('newPlayer');
+
+    socket.on('shot', (state) => {
+        shootSound.play();
+    });
+
+    socket.on('explode', (state) => {
+        explodeSound.play();
+    });
+
+        socket.on('blip', (state) => {
+        blipSound.play();
+    });
 
     // Listen to the server and draw the players
     socket.on('state', (state) => {

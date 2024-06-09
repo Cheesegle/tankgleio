@@ -1,6 +1,9 @@
 //get the canvas
 var canvas = document.getElementById("game")
 
+var mouseXPos = 0;
+var mouseYPos = 0;
+
 //Object that stores the current pressed keys
 const playerMovement = {
     up: false,
@@ -45,8 +48,8 @@ function mouseMoved() {
     if (gameState) {
         if (gameState.players[socket.id]) {
             // Calculate the angle between tank position and mouse position
-            const mouseXPos = ((mouseX / windowWidth) * scaledWidth) + playerCameraX;
-            const mouseYPos = ((mouseY / windowHeight) * scaledHeight) + playerCameraY;
+            mouseXPos = ((mouseX / windowWidth) * scaledWidth) + playerCameraX;
+            mouseYPos = ((mouseY / windowHeight) * scaledHeight) + playerCameraY;
             const tankX = gameState.players[socket.id].x; // Assuming the tank's x position is stored in gameState
             const tankY = gameState.players[socket.id].y; // Assuming the tank's y position is stored in gameState
             const angle = Math.atan2(mouseYPos - tankY, mouseXPos - tankX);

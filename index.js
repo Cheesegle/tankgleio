@@ -41,7 +41,7 @@ const getRandomEmptyLocation = () => {
 
 var spawnLocations = [];
 // Generate 20 random spawn locations
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i < 5; i++) {
     spawnLocations.push(getRandomEmptyLocation());
 }
 

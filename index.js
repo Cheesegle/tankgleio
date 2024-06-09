@@ -25,6 +25,14 @@ const gameState = {
     bullets: []
 };
 
+function truncateString(str, num) {
+  if (str.length > num) {
+    return str.slice(0, num) + "...";
+  } else {
+    return str;
+  }
+}
+
 const getRandomEmptyLocation = () => {
     const emptyLocations = [];
     for (let i = 0; i < gameMap.length; i++) {
@@ -54,7 +62,7 @@ io.on('connection', (socket) => {
     socket.on('newPlayer', (data) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, data.username);
+        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30));
         gameState.players[socket.id] = newPlayer;
     });
 

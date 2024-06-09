@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
 
         if (!player) return; // Ensure player exists in gameState
 
+        // Use the object to move the player's coordinates
         let rotationSpeed = 0.1; // Adjust the rotation speed as needed
         if (playerMovement.left) {
             player.x -= 4;

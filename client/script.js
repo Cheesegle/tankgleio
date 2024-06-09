@@ -31,18 +31,6 @@ function draw() {
     }
 }
 
-// p5.js mouseMoved function
-function mouseMoved() {
-    // Calculate the angle between tank position and mouse position
-    const mouseX = mouseX;
-    const mouseY = mouseY;
-    const tankX = gameState.players[socket.id].x; // Assuming the tank's x position is stored in gameState
-    const tankY = gameState.players[socket.id].y; // Assuming the tank's y position is stored in gameState
-    const angle = Math.atan2(mouseY - tankY, mouseX - tankX);
-    // Emit the turret angle to the server
-    socket.emit('turretAngle', angle);
-}
-
 // Draw a player tank
 function drawPlayer(player) {
     let tank = new Tank(

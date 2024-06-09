@@ -48,7 +48,7 @@ function mouseMoved() {
     const tankX = gameState.players[socket.id].x; // Assuming the tank's x position is stored in gameState
     const tankY = gameState.players[socket.id].y; // Assuming the tank's y position is stored in gameState
     const angle = Math.atan2(mouseYPos - tankY, mouseXPos - tankX);
-    playerMovement.angle = angle;
+    playerMovement.mouseAngle = angle;
 }
 
 //Send the movement to server 60 times / second

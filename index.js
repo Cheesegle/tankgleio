@@ -52,7 +52,7 @@ const lastShotTimes = {};
 
 io.on('connection', (socket) => {
     socket.on('newPlayer', (data) => {
-        socket.emit('map', gameMap);
+        socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
         const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, data.username);
         gameState.players[socket.id] = newPlayer;

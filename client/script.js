@@ -61,7 +61,7 @@ function setup() {
         blipSound.play();
     });
 
-    socket.on('map', (serverTiles) => {
+    socket.on('mapUpdate', (serverTiles) => {
         tiles = serverTiles;
     });
 

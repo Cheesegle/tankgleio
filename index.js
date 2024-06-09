@@ -6,6 +6,10 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var Player = require('./player').Player;
 
+function lerp(start, end, amount) {
+    return (1 - amount) * start + amount * end;
+}
+
 //Serve the /client folder
 var htmlPath = path.join(__dirname, 'client');
 app.use(express.static(htmlPath));
@@ -25,35 +29,45 @@ io.on('connection', (socket) => {
     socket.on('newPlayer', () => {
         //Someone joined!
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, )
+        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'red');
+        gameState.players[socket.id] = newPlayer;
     })
 
     socket.on('playerMovement', (playerMovement) => {
         //Someone Moved!
-        const player = gameState.players[socket.id]
+        const player = gameState.players[socket.id];
 
-        //Use the object to move the players coordinates
+        if (!player) return; // Ensure player exists in gameState
+
+        // Use the object to move the player's coordinates
+        let rotationSpeed = 0.05; // Adjust the rotation speed as needed
         if (playerMovement.left) {
-            player.x -= 4
+            player.x -= 4;
+            player.angle = lerp(player.angle, Math.PI, rotationSpeed); // Rotate left
         }
         if (playerMovement.right) {
-            player.x += 4
+            player.x += 4;
+            player.angle = lerp(player.angle, 0, rotationSpeed); // Rotate right
         }
-
         if (playerMovement.up) {
-            player.y -= 4
+            player.y -= 4;
+            player.angle = lerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
         }
         if (playerMovement.down) {
-            player.y += 4
+            player.y += 4;
+            player.angle = lerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
+        }
+        if (playerMovement.angle) {
+            player.turretAngle = playerMovement.angle;
         }
     })
-
 
     socket.on("disconnect", () => {
         //When someone leaves, remove them from the gamestate
-        delete gameState.players[socket.id]
+        delete gameState.players[socket.id];
     })
 })
+
 
 //Emit the gamestate to the clients 60 times / second
 setInterval(() => {

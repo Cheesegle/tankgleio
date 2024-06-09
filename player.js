@@ -1,5 +1,5 @@
 class Player {
-    constructor(x, y, angle, turretAngle, color, turretColor, sideColor) {
+    constructor(x, y, angle, turretAngle, color, turretColor) {
         this.width = 43;
         this.height = 33;
         this.turretBaseSide = 19;
@@ -12,7 +12,6 @@ class Player {
         this.turretAngle = turretAngle;
         this.color = color;
         this.turretColor = turretColor;
-        this.sideColor = sideColor;
         this.dead = false;
     }
 }

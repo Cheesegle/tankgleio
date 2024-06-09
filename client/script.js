@@ -10,6 +10,7 @@ let playerCameraY = 0;
 let lerpedPlayerX = 0;
 let lerpedPlayerY = 0;
 const cameraLerpAmount = 0.07;
+let gameStarted = false;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -25,14 +26,17 @@ function preload() {
 }
 
 function setup() {
-    // Initialize socket.io
-    socket = io();
-
     // Create canvas
     createCanvas(windowWidth, windowHeight);
 
-    // Join the game
-    socket.emit('newPlayer');
+    // Initialize socket.io
+    socket = io();
+
+    // Show the start menu
+    document.getElementById('startMenu').style.display = 'block';
+
+    // Event listener for start button
+    document.getElementById('startButton').addEventListener('click', startGame);
 
     socket.on('shot', (state) => {
         shootSound.play();
@@ -42,20 +46,35 @@ function setup() {
         explodeSound.play();
     });
 
-        socket.on('blip', (state) => {
+    socket.on('blip', (state) => {
         blipSound.play();
     });
 
     // Listen to the server and draw the players
     socket.on('state', (state) => {
-        // Update local gameState
-        lastTick = performance.now();
-        prevState = gameState;
-        gameState = state;
+        if (gameStarted) {
+            // Update local gameState
+            lastTick = performance.now();
+            prevState = gameState;
+            gameState = state;
+        }
     });
 }
 
+function startGame() {
+    // Hide the start menu
+    document.getElementById('startMenu').style.display = 'none';
+
+    // Join the game
+    socket.emit('newPlayer');
+    gameStarted = true;
+}
+
 function draw() {
+    if (!gameStarted) {
+        return; // Skip drawing if the game hasn't started
+    }
+
     // Clear the canvas
     clear();
 
@@ -138,7 +157,9 @@ function drawBullet(bullet) {
 }
 
 function mouseClicked() {
-    socket.emit('shoot')
+    if (gameStarted) {
+        socket.emit('shoot');
+    }
 }
 
 // Draw a player tank

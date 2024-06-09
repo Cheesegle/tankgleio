@@ -1,19 +1,36 @@
 <!doctype html>
 <html>
-
 <head>
     <title>Tankgle.io</title>
     <style>
-    html,
-    body {
-        margin: 0;
-        height: 100%;
-        overflow: hidden;
-    }
+        html, body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #startMenu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: none; /* Hide by default */
+        }
+        #startMenu button {
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
-
 <body>
+    <div id="startMenu">
+        <h1>Tankgle.io</h1>
+        <button id="startButton">Start Game</button>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -22,5 +39,4 @@
     <script src="/tank.js"></script>
     <script src="/controller.js"></script>
 </body>
-
 </html>

@@ -13,6 +13,9 @@ const cameraLerpAmount = 0.07;
 let gameStarted = false;
 let username = '';
 let customFont;
+let scaledWidth;
+let scaledHeight;
+
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -90,6 +93,13 @@ function draw() {
     // Clear the canvas
     clear();
 
+    // Apply scaling
+    scale(windowWidth / 1000);
+
+    // Calculate scaled canvas dimensions
+    scaledWidth = windowWidth / (windowWidth / 1000);
+    scaledHeight = windowHeight / (windowWidth / 1000);
+
     background('#D8B077');
 
     lastTickDiff = (performance.now() - lastTick) / tickRate;
@@ -103,8 +113,8 @@ function draw() {
     }
 
     // Update camera position
-    playerCameraX = lerp(playerCameraX, lerpedPlayerX - width / 2, 0.01);
-    playerCameraY = lerp(playerCameraY, lerpedPlayerY - height / 2, 0.01);
+    playerCameraX = lerp(playerCameraX, lerpedPlayerX - scaledWidth / 2, cameraLerpAmount);
+    playerCameraY = lerp(playerCameraY, lerpedPlayerY - scaledHeight / 2, cameraLerpAmount);
 
     // Translate canvas to follow player
     translate(-playerCameraX, -playerCameraY);
@@ -141,6 +151,8 @@ function draw() {
     }
 }
 
+
+
 // Draw a bullet with linear interpolation
 function drawBullet(bullet) {
     if (prevState && prevState.bullets) {
@@ -163,7 +175,11 @@ function drawBullet(bullet) {
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();
-    fill('yellow');
+    if (bullet.owner === socket.id) {
+        fill('green');
+    } else {
+        fill('red');
+    }
     ellipse(bullet.x, bullet.y, bullet.size, bullet.size);
     pop();
 }
@@ -190,12 +206,14 @@ function drawPlayer(player, playerId) {
         tank.render();
 
         // Draw the username
+        push();
         fill(255);
         textAlign(CENTER);
         textSize(16);
         textFont(customFont); // Use the custom font
         textAlign(CENTER);
         text(player.username, tank.x + tank.width / 2, tank.y - 25); // Display the username above the tank
+        pop();
     }
 }
 

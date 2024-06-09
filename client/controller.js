@@ -43,12 +43,13 @@ document.addEventListener('keyup', keyUpHandler, false);
 // p5.js mouseMoved function
 function mouseMoved() {
     if (gameState) {
-        if(gameState.players[socket.id]) {
+        if (gameState.players[socket.id]) {
             // Calculate the angle between tank position and mouse position
-            const mouseXPos = mouseX - canvas.offsetLeft + playerCameraX; // Adjusted for camera position
-            const mouseYPos = mouseY - canvas.offsetTop + playerCameraY; // Adjusted for camera position
+            const mouseXPos = ((mouseX / windowWidth) * scaledWidth) + playerCameraX;
+            const mouseYPos = ((mouseY / windowHeight) * scaledHeight) + playerCameraY;
             const tankX = gameState.players[socket.id].x; // Assuming the tank's x position is stored in gameState
             const tankY = gameState.players[socket.id].y; // Assuming the tank's y position is stored in gameState
+            ellipse(mouseXPos, mouseYPos, 20, 20)
             const angle = Math.atan2(mouseYPos - tankY, mouseXPos - tankX);
             playerMovement.mouseAngle = angle;
         }

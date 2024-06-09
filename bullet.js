@@ -10,6 +10,7 @@ class Bullet {
         this.width = 10; // Assuming default bullet width
         this.height = 10; // Assuming default bullet height
         this.owner = owner;
+        this.damage = 50;
     }
 
     move() {

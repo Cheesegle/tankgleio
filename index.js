@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 const tileSize = 50; // Size of each tile
 
-const gameMap = generateMap(50, 50, 10, 0.5);
+const gameMap = generateMap(30, 30, 10, 0.1);
 
 const gameState = {
     players: {},

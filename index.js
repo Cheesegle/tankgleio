@@ -10,6 +10,12 @@ function lerp(start, end, amount) {
     return (1 - amount) * start + amount * end;
 }
 
+function rLerp (A, B, w){
+    let CS = (1-w)*Math.cos(A) + w*Math.cos(B);
+    let SN = (1-w)*Math.sin(A) + w*Math.sin(B);
+    return Math.atan2(SN,CS);
+}
+
 //Serve the /client folder
 var htmlPath = path.join(__dirname, 'client');
 app.use(express.static(htmlPath));
@@ -43,19 +49,19 @@ io.on('connection', (socket) => {
         let rotationSpeed = 0.1; // Adjust the rotation speed as needed
         if (playerMovement.left) {
             player.x -= 4;
-            player.angle = lerp(player.angle, Math.PI, rotationSpeed); // Rotate left
+            player.angle = rLerp(player.angle, Math.PI, rotationSpeed); // Rotate left
         }
         if (playerMovement.right) {
             player.x += 4;
-            player.angle = lerp(player.angle, 0, rotationSpeed); // Rotate right
+            player.angle = rLerp(player.angle, 0, rotationSpeed); // Rotate right
         }
         if (playerMovement.up) {
             player.y -= 4;
-            player.angle = lerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
+            player.angle = rLerp(player.angle, -Math.PI / 2, rotationSpeed); // Rotate up
         }
         if (playerMovement.down) {
             player.y += 4;
-            player.angle = lerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
+            player.angle = rLerp(player.angle, Math.PI / 2, rotationSpeed); // Rotate down
         }
         if (playerMovement.mouseAngle) {
             player.turretAngle = playerMovement.mouseAngle;

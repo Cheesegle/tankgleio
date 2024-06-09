@@ -11,6 +11,8 @@ let lerpedPlayerX = 0;
 let lerpedPlayerY = 0;
 const cameraLerpAmount = 0.07;
 let gameStarted = false;
+let username = '';
+let customFont;
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -23,6 +25,8 @@ function preload() {
     shootSound = loadSound('shoot.wav');
     explodeSound = loadSound('explosion.wav');
     blipSound = loadSound('blip.wav');
+    // Load custom font
+    customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
 
 function setup() {
@@ -62,11 +66,19 @@ function setup() {
 }
 
 function startGame() {
+    // Get the username from the input field
+    username = document.getElementById('usernameInput').value;
+
+    if (!username) {
+        alert('Please enter a username.');
+        return;
+    }
+
     // Hide the start menu
     document.getElementById('startMenu').style.display = 'none';
 
-    // Join the game
-    socket.emit('newPlayer');
+    // Join the game with the username
+    socket.emit('newPlayer', { username: username });
     gameStarted = true;
 }
 
@@ -138,7 +150,7 @@ function drawBullet(bullet) {
                 const lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
                 const lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
                 push();
-                if(bullet.owner === socket.id){
+                if (bullet.owner === socket.id) {
                     fill('green');
                 } else {
                     fill('red');
@@ -176,6 +188,14 @@ function drawPlayer(player, playerId) {
             player.height
         );
         tank.render();
+
+        // Draw the username
+        fill(255);
+        textAlign(CENTER);
+        textSize(16);
+        textFont(customFont); // Use the custom font
+        textAlign(CENTER);
+        text(player.username, tank.x + tank.width / 2, tank.y - 25); // Display the username above the tank
     }
 }
 

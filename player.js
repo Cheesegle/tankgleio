@@ -1,5 +1,5 @@
 class Player {
-    constructor(x, y, angle, turretAngle, color, turretColor, id) {
+    constructor(x, y, angle, turretAngle, color, turretColor, id, username) {
         this.x = x || 0;
         this.y = y || 0;
         this.angle = angle || 0;
@@ -15,6 +15,7 @@ class Player {
         this.health = this.maxHealth;
         this.bullets = [];
         this.id = id;
+        this.username = username;
     }
 
     respawn(spawnLocations) {

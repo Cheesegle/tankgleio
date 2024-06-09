@@ -52,9 +52,9 @@ let movementQueue = {}; // Object to store movement updates
 const lastShotTimes = {};
 
 io.on('connection', (socket) => {
-    socket.on('newPlayer', () => {
+    socket.on('newPlayer', (data) => {
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id);
+        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, data.username);
         gameState.players[socket.id] = newPlayer;
     });
 

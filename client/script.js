@@ -100,7 +100,7 @@ function drawBullet(bullet) {
                 const lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
                 const lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
                 push();
-                fill('yellow'); // Example bullet color
+                fill('white'); // Example bullet color
                 ellipse(lerpedX, lerpedY, bullet.width, bullet.height);
                 pop();
                 return; // Exit the loop once the bullet is found

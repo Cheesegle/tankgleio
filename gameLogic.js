@@ -1,4 +1,8 @@
 const SAT = require('sat');
+const rbush = require('rbush');
+
+const tileIndex = new rbush();
+
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -102,6 +106,47 @@ const checkBulletPlayerCollision = (bullet, player) => {
     return false;
 };
 
+const initMap = (gameMap, tileSize) => {
+    // Populate the spatial index with tile data
+    for (let i = 0; i < gameMap.length; i++) {
+        for (let j = 0; j < gameMap[i].length; j++) {
+            if (gameMap[i][j] === 1) { // Assuming 1 represents a tile
+                const tileBounds = {
+                    minX: j * tileSize,
+                    minY: i * tileSize,
+                    maxX: (j + 1) * tileSize,
+                    maxY: (i + 1) * tileSize,
+                    tile: {
+                        x: j * tileSize,
+                        y: i * tileSize,
+                        width: tileSize,
+                        height: tileSize
+                    }
+                };
+                tileIndex.insert(tileBounds);
+            }
+        }
+    }
+}
+
+// Function to check bullet collision with nearby tiles using rbush
+const checkBulletMapCollision = (bullet, gameMap) => {
+    const nearbyTiles = tileIndex.search({
+        minX: bullet.x - bullet.size / 2,
+        minY: bullet.y - bullet.size / 2,
+        maxX: bullet.x + bullet.size / 2,
+        maxY: bullet.y + bullet.size / 2
+    });
+
+    for (const tile of nearbyTiles) {
+        const tileRect = tile.tile;
+        if (checkBulletTileCollision(bullet, tileRect)) {
+            return true; // Collision detected with a nearby tile
+        }
+    }
+
+    return false; // No collision detected with nearby tiles
+};
 
 // Function to check collision between a bullet and a tile
 const checkBulletTileCollision = (bullet, tile) => {
@@ -122,13 +167,13 @@ const checkBulletTileCollision = (bullet, tile) => {
     return collided;
 };
 
-
+// Update bullets function using rbush for collision detection
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
-        //update bullet position
+        // Update bullet position
         bullet.x += bullet.vx * bullet.speed;
         bullet.y += bullet.vy * bullet.speed;
 
@@ -141,25 +186,12 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             }
         }
 
-        // Check collision with tiles
-        for (let j = 0; j < gameMap.length; j++) {
-            for (let k = 0; k < gameMap[j].length; k++) {
-                if (gameMap[j][k] === 1) { // Assuming 1 represents a tile
-                    const tile = {
-                        x: k * tileSize,
-                        y: j * tileSize,
-                        width: tileSize,
-                        height: tileSize
-                    };
-                    if (checkBulletTileCollision(bullet, tile)) {
-                        if (bullet.bounces <= 0) {
-                            bulletsToRemove.push(bulletId);
-                        }
-                        bullet.bounces -= 1;
-                        break; // Exit the loop if bullet collided with a tile
-                    }
-                }
+        // Check collision with nearby tiles using rbush
+        if (checkBulletMapCollision(bullet, gameMap)) {
+            if (bullet.bounces <= 0) {
+                bulletsToRemove.push(bulletId);
             }
+            bullet.bounces -= 1;
         }
 
         // Check if bullet is out of bounds
@@ -171,12 +203,13 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 
     // Remove collided or out-of-bounds bullets
     for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
-        delete gameState.bullets[bulletsToRemove[i]]
+        delete gameState.bullets[bulletsToRemove[i]];
     }
 };
 
 
 module.exports = {
     updateMovement,
-    updateBullets
+    updateBullets,
+    initMap
 };

@@ -5,7 +5,7 @@ const path = require('path');
 
 const Player = require('./player');
 const Bullet = require('./bullet'); // Import the Bullet class
-const { updateMovement, updateBullets } = require('./gameLogic');
+const { updateMovement, updateBullets, initMap } = require('./gameLogic');
 const { generateMap } = require('./mapGenerator');
 
 const app = express();
@@ -19,6 +19,8 @@ app.use(express.static(path.join(__dirname, 'client')));
 const tileSize = 50; // Size of each tile
 
 const gameMap = generateMap(50, 50, 10, 0.5);
+
+initMap(gameMap, tileSize);
 
 const gameState = {
     players: {},
@@ -48,7 +50,7 @@ const getRandomEmptyLocation = () => {
 };
 
 var spawnLocations = [];
-// Generate 20 random spawn locations
+// Generate 5 random spawn locations
 for (let i = 0; i < 5; i++) {
     spawnLocations.push(getRandomEmptyLocation());
 }

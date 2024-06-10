@@ -3,7 +3,6 @@ const rbush = require('rbush');
 
 const tileIndex = new rbush();
 
-
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
 };
@@ -88,8 +87,6 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
     movementQueue = {}; // Clear the movement queue after processing
 };
 
-
-
 // Function to check collision between a bullet and a player
 const checkBulletPlayerCollision = (bullet, player) => {
     const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
@@ -173,31 +170,44 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
-        // Update bullet position
-        bullet.x += bullet.vx * bullet.speed;
-        bullet.y += bullet.vy * bullet.speed;
 
-        // Check collision with players
-        for (const playerId in gameState.players) {
-            const player = gameState.players[playerId];
-            if (checkBulletPlayerCollision(bullet, player)) {
-                bulletsToRemove.push(bulletId);
-                break; // Exit the loop if bullet collided with a player
+        //sub-stepping (whatever its called)
+        const steps = 5;
+        const stepSize = bullet.speed / steps;
+        let collided = false;
+
+        for (let step = 0; step < steps; step++) {
+            bullet.x += bullet.vx * stepSize;
+            bullet.y += bullet.vy * stepSize;
+
+            for (const playerId in gameState.players) {
+                const player = gameState.players[playerId];
+                if (checkBulletPlayerCollision(bullet, player)) {
+                    bulletsToRemove.push(bulletId);
+                    collided = true;
+                    break; 
+                }
             }
-        }
 
-        // Check collision with nearby tiles using rbush
-        if (checkBulletMapCollision(bullet, gameMap)) {
-            if (bullet.bounces <= 0) {
-                bulletsToRemove.push(bulletId);
+            if (collided) break;
+
+            // Check collision with nearby tiles using rbush
+            if (checkBulletMapCollision(bullet, gameMap)) {
+                if (bullet.bounces <= 0) {
+                    bulletsToRemove.push(bulletId);
+                    collided = true;
+                    break;
+                }
+                bullet.bounces -= 1;
             }
-            bullet.bounces -= 1;
-        }
 
-        // Check if bullet is out of bounds
-        if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
-            bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
-            bulletsToRemove.push(bulletId);
+            if (collided) break;
+
+            if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
+                bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
+                bulletsToRemove.push(bulletId);
+                break;
+            }
         }
     }
 

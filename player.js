@@ -25,6 +25,7 @@ class Player {
                 this.bulletSpeed = 15; // Slower bullets
                 this.bulletSize = 20;
                 this.bulletDamage = 150; // Reduced damage
+                this.regenRate = 1;
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -38,6 +39,7 @@ class Player {
                 this.bulletSpeed = 18; // Balanced bullet speed
                 this.bulletSize = 10;
                 this.bulletDamage = 60; // Balanced damage
+                this.regenRate = 1;
                 break;
             case 'sniper':
                 this.width = 43;
@@ -51,6 +53,7 @@ class Player {
                 this.bulletSpeed = 35; // Slightly reduced bullet speed
                 this.bulletSize = 10;
                 this.bulletDamage = 120; // Slightly reduced damage
+                this.regenRate = 1;
                 break;
             case 'speedy':
                 this.width = 43;
@@ -64,6 +67,7 @@ class Player {
                 this.bulletSpeed = 25; // Faster bullets
                 this.bulletSize = 10;
                 this.bulletDamage = 80; // Moderate damage
+                this.regenRate = 1;
                 break;
             case 'normal':
             default:
@@ -72,12 +76,13 @@ class Player {
                 this.hitboxWidth = 38;
                 this.hitboxHeight = 38;
                 this.moveSpeed = 10;
-                this.maxHealth = 100;
+                this.maxHealth = 110;
                 this.mineCooldown = 5000;
                 this.shootCooldown = 500;
                 this.bulletSpeed = 20;
                 this.bulletSize = 10;
                 this.bulletDamage = 100;
+                this.regenRate = 1;
                 break;
         }
 

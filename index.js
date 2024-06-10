@@ -144,6 +144,10 @@ function updatePlayers() {
             io.to(player.id).emit('dead');
             io.emit('explodeSound');
         }
+
+        if (player.health < player.maxHealth) {
+            gameState.players[playerId].health += player.regenRate;
+        }
     }
 }
 

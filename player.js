@@ -26,7 +26,7 @@ class Player {
                 this.bulletDamage = 150; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
-                this.color = 'blue';
+                this.color = '#5865F2';
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -42,7 +42,7 @@ class Player {
                 this.bulletDamage = 60; // Balanced damage
                 this.regenRate = 3; // Higher regeneration rate
                 this.bulletBounces = 4; // Increased bullet bounces
-                this.color = 'pink';
+                this.color = '#FEE75C';
                 break;
             case 'sniper':
                 this.width = 43;
@@ -58,7 +58,7 @@ class Player {
                 this.bulletDamage = 120; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
-                this.color = 'red';
+                this.color = '#ED4245';
                 break;
             case 'speedy':
                 this.width = 43;
@@ -74,7 +74,7 @@ class Player {
                 this.bulletDamage = 80; // Moderate damage
                 this.regenRate = 3; // Higher regeneration rate
                 this.bulletBounces = 2;
-                this.color = 'yellow';
+                this.color = '#FFFFFF';
                 break;
             case 'normal':
             default:
@@ -91,7 +91,7 @@ class Player {
                 this.bulletDamage = 100;
                 this.regenRate = 2; // Slightly higher regeneration rate for balance
                 this.bulletBounces = 2;
-                this.color = 'orange';
+                this.color = '#E67E22';
                 break;
         }
 

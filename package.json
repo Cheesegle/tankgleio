@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "dependencies": {
-    "express": "^4.18.1",
+    "express": "^4.19.2",
     "quaternion": "^1.5.1",
     "rbush": "^3.0.1",
     "sat": "^0.9.0",

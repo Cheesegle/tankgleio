@@ -12,6 +12,7 @@ let lerpedPlayerY = 0;
 const cameraLerpAmount = 0.07;
 let gameStarted = false;
 let username = '';
+const SHADOW = "rgba(0, 0, 0, 0.3)";
 let customFont;
 let scaledWidth;
 let scaledHeight;
@@ -191,13 +192,44 @@ function draw() {
     // Translate canvas to follow player with interpolated camera position
     translate(-playerCameraX, -playerCameraY);
 
+    //render tile shadow
+    if (gameState && tiles) {
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                if (tiles[i][j] === 1) {
+                    push();
+                    fill(SHADOW); // Example tile color
+                    noStroke();
+                    rect(j * tileSize + 8, i * tileSize + 8, tileSize, tileSize);
+                    pop();
+                }
+            }
+        }
+    }
+
+    // Draw bullets
+    if (gameState && gameState.bullets) {
+        for (let bulletId in gameState.bullets) {
+            let bullet = gameState.bullets[bulletId];
+            drawBullet(bullet);
+        }
+    }
+
+    // Draw the players that the server sent
+    if (gameState && gameState.players && prevState) {
+        for (let playerId in gameState.players) {
+            let player = gameState.players[playerId];
+            drawPlayer(player, playerId);
+        }
+    }
+
     // Render tiles
     if (gameState && tiles) {
         for (let i = 0; i < tiles.length; i++) {
             for (let j = 0; j < tiles[i].length; j++) {
                 if (tiles[i][j] === 1) {
                     push();
-                    fill(100); // Example tile color
+                    fill("#c9b7b1"); // Example tile color
                     strokeWeight(2);
                     rect(j * tileSize, i * tileSize, tileSize, tileSize);
                     pop();
@@ -209,22 +241,6 @@ function draw() {
     // Draw mines and mine explosions
     drawMines();
     drawMineExplosions();
-
-    // Draw the players that the server sent
-    if (gameState && gameState.players && prevState) {
-        for (let playerId in gameState.players) {
-            let player = gameState.players[playerId];
-            drawPlayer(player, playerId);
-        }
-    }
-
-    // Draw bullets
-    if (gameState && gameState.bullets) {
-        for (let bulletId in gameState.bullets) {
-            let bullet = gameState.bullets[bulletId];
-            drawBullet(bullet);
-        }
-    }
 }
 
 
@@ -235,6 +251,11 @@ function drawBullet(bullet) {
         let lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
         let lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
         push();
+
+        noStroke();
+        fill(SHADOW);
+        ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
+
         if (bullet.owner === socket.id) {
             fill('green');
         } else {
@@ -246,6 +267,11 @@ function drawBullet(bullet) {
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();
+
+    noStroke();
+    fill(SHADOW);
+    ellipse(bullet.x + 2, bullet.y + 2, bullet.size);
+
     if (bullet.owner === socket.id) {
         fill('green');
     } else {

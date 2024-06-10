@@ -12,6 +12,7 @@ let lerpedPlayerY = 0;
 const cameraLerpAmount = 0.07;
 let gameStarted = false;
 let username = '';
+const SHADOW = "rgba(0, 0, 0, 0.3)";
 let customFont;
 let scaledWidth;
 let scaledHeight;
@@ -191,24 +192,20 @@ function draw() {
     // Translate canvas to follow player with interpolated camera position
     translate(-playerCameraX, -playerCameraY);
 
-    // Render tiles
+    //render tile shadow
     if (gameState && tiles) {
         for (let i = 0; i < tiles.length; i++) {
             for (let j = 0; j < tiles[i].length; j++) {
                 if (tiles[i][j] === 1) {
                     push();
-                    fill(100); // Example tile color
-                    strokeWeight(2);
-                    rect(j * tileSize, i * tileSize, tileSize, tileSize);
+                    fill(SHADOW); // Example tile color
+                    noStroke();
+                    rect(j * tileSize + 8, i * tileSize + 8, tileSize, tileSize);
                     pop();
                 }
             }
         }
     }
-
-    // Draw mines and mine explosions
-    drawMines();
-    drawMineExplosions();
 
     // Draw the players that the server sent
     if (gameState && gameState.players && prevState) {
@@ -225,6 +222,25 @@ function draw() {
             drawBullet(bullet);
         }
     }
+
+    // Render tiles
+    if (gameState && tiles) {
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                if (tiles[i][j] === 1) {
+                    push();
+                    fill("#c9b7b1"); // Example tile color
+                    strokeWeight(2);
+                    rect(j * tileSize, i * tileSize, tileSize, tileSize);
+                    pop();
+                }
+            }
+        }
+    }
+
+    // Draw mines and mine explosions
+    drawMines();
+    drawMineExplosions();
 }
 
 
@@ -235,6 +251,11 @@ function drawBullet(bullet) {
         let lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
         let lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
         push();
+
+        noStroke();
+        fill(SHADOW);
+        ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
+
         if (bullet.owner === socket.id) {
             fill('green');
         } else {
@@ -246,6 +267,11 @@ function drawBullet(bullet) {
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();
+
+    noStroke();
+    fill(SHADOW);
+    ellipse(bullet.x + 2, bullet.y + 2, bullet.size);
+
     if (bullet.owner === socket.id) {
         fill('green');
     } else {

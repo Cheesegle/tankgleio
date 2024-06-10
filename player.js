@@ -52,6 +52,19 @@ class Player {
                 this.bulletSize = 10;
                 this.bulletDamage = 120; // Slightly reduced damage
                 break;
+            case 'speedy':
+                this.width = 43;
+                this.height = 33;
+                this.hitboxWidth = 38;
+                this.hitboxHeight = 38;
+                this.moveSpeed = 15; // Higher speed
+                this.maxHealth = 70; // Lower health
+                this.mineCooldown = 5000;
+                this.shootCooldown = 600; // Balanced shooting speed
+                this.bulletSpeed = 25; // Faster bullets
+                this.bulletSize = 10;
+                this.bulletDamage = 80; // Moderate damage
+                break;
             case 'normal':
             default:
                 this.width = 43;

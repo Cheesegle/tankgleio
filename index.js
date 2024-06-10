@@ -91,7 +91,8 @@ io.on('connection', (socket) => {
                     player.x + player.width / 2,
                     player.y + player.height / 2,
                     Math.cos(player.turretAngle),
-                    Math.sin(player.turretAngle), player.id,
+                    Math.sin(player.turretAngle),
+                    player.id,
                     player.bulletSpeed,
                     player.bulletSize,
                     player.bulletDamage
@@ -138,7 +139,9 @@ function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
         if (player.health <= 0) {
-            player.respawn(spawnLocations);
+            delete gameState.players[playerId];
+            delete movementQueue[playerId];
+            io.to(player.id).emit('dead');
             io.emit('explodeSound');
         }
     }

@@ -75,6 +75,10 @@ function setup() {
         tiles = serverTiles;
     });
 
+    socket.on('dead', (state) => {
+        document.getElementById('startMenu').style.display = 'block';;
+    });
+
     // Listen to the server and draw the players
     socket.on('state', (state) => {
         if (gameStarted) {

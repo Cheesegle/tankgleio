@@ -24,7 +24,7 @@ class Player {
                 this.shootCooldown = 500;
                 this.bulletSpeed = 20;
                 this.bulletSize = 20;
-                this.bulletdamage = 200;
+                this.bulletDamage = 200;
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -37,7 +37,7 @@ class Player {
                 this.shootCooldown = 500;
                 this.bulletSpeed = 20;
                 this.bulletSize = 10;
-                this.bulletdamage = 50;
+                this.bulletDamage = 50;
                 break;
             case 'sniper':
                 this.width = 43;
@@ -50,7 +50,7 @@ class Player {
                 this.shootCooldown = 1500;
                 this.bulletSpeed = 40;
                 this.bulletSize = 10;
-                this.bulletdamage = 100;
+                this.bulletDamage = 100;
                 break;
             case 'normal':
             default:
@@ -64,7 +64,7 @@ class Player {
                 this.shootCooldown = 500;
                 this.bulletSpeed = 20;
                 this.bulletSize = 10;
-                this.bulletdamage = 100;
+                this.bulletDamage = 100;
                 break;
         }
 

@@ -7,29 +7,101 @@ html,
 body {
     margin: 0;
     height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
     font-family: 'Poppins-Bold', sans-serif;
     background-color: #D8B077;
 }
 
 #startMenu {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 400px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    border-radius: 10px;
-    display: none;
-    /* Hide by default */
+    align-items: center;
+}
+
+#startMenu h1 {
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 36px;
 }
 
 #startMenu input,
 #startMenu button {
     display: block;
-    margin: 10px auto;
-    padding: 10px;
-    font-size: 20px;
+    width: 92%;
+    margin: 10px 0;
+    padding: 15px;
+    font-size: 18px;    
     font-family: 'Poppins-Bold', sans-serif;
+    border-radius: 10px;
+    border: none;
+}
+
+#startMenu input {
+    border: 2px solid #ccc;
+
+}
+
+#startMenu button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: auto;
+}
+
+#startMenu button:hover {
+    background-color: #0056b3;
+}
+
+.tankTypeContainer {
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding:17px;
+}
+
+.tankTypeContainer select {
+    padding: 10px;
+    width: 100%;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #dddddd;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.tankInfo {
+    padding: 1px;
+    width: 100%;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #8f8f8f;
+    font-size: 16px;
+    text-align: center;
+    height: 60px; /* Fixed height to prevent resizing */
+    overflow: hidden; /* Hide overflow text */
+    box-sizing: border-box; /* Include padding in height */
+}
+
+p {
+    font-size: 14px;
+    color: #fff;
+    line-height: 1.5;
+    margin-top: 20px;
+    text-align: center; /* Center the text for instructions */
 }

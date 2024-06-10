@@ -12,20 +12,21 @@
     <div id="startMenu">
         <h1>Tankgle.io</h1>
         <input id="usernameInput" type="text" placeholder="Enter your username">
-        <!-- Tank Type Dropdown -->
-        <select id="tankTypeSelector">
-            <option value="normal">Normal Tank</option>
-            <option value="big">Big Tank</option>
-            <option value="mineLayer">Mine Layer</option>
-            <option value="sniper">Sniper Tank</option>
-            <option value="speedy">Speedy Tank</option>
-        </select>
+        <!-- Tank Type Dropdown with info display -->
+        <div class="tankTypeContainer">
+            <select id="tankTypeSelector" onchange="updateTankInfo()">
+                <option value="normal">Normal Tank</option>
+                <option value="big">Big Tank</option>
+                <option value="mineLayer">Mine Layer</option>
+                <option value="sniper">Sniper Tank</option>
+                <option value="speedy">Speedy Tank</option>
+            </select>
+            <div id="tankInfo" class="tankInfo">A balanced tank with average speed and firepower.</div>
+        </div>
         <button id="startButton">Start Game</button>
         <p>
-            WASD: move
-            <br>
-            SPACE: place mine
-            <br>
+            WASD: move<br>
+            SPACE: place mine<br>
             SCROLL: adjust zoom
         </p>
     </div>
@@ -36,6 +37,7 @@
     <script src="/clientRunner.js"></script>
     <script src="/clientTank.js"></script>
     <script src="/clientController.js"></script>
+
 </body>
 
 </html>

@@ -331,3 +331,28 @@ function mouseWheel(event) {
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
+
+function updateTankInfo() {
+    let tankType = document.getElementById('tankTypeSelector').value;
+    let info;
+    switch (tankType) {
+        case 'normal':
+            info = 'A balanced tank with average speed and firepower. Bullets bounce twice.';
+            break;
+        case 'big':
+            info = 'A bigger tank with higher durability and slower speed. Bullets bounce twice.';
+            break;
+        case 'mineLayer':
+            info = 'A tank that can lay mines faster. Bullets bounce four times.';
+            break;
+        case 'sniper':
+            info = 'A tank with high damage and high speed bullets. Bullets bounce twice.';
+            break;
+        case 'speedy':
+            info = 'A fast tank with lower durability. Bullets bounce twice.';
+            break;
+        default:
+            info = 'Select a tank type to see its description.';
+    }
+    document.getElementById('tankInfo').innerText = info;
+}

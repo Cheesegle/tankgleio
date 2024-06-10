@@ -26,7 +26,7 @@ class Player {
                 this.bulletSize = 20;
                 this.bulletDamage = 150; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
-                this.bulletBounces = 3;
+                this.bulletBounces = 2;
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -56,7 +56,7 @@ class Player {
                 this.bulletSize = 10;
                 this.bulletDamage = 120; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
-                this.bulletBounces = 3;
+                this.bulletBounces = 2;
                 break;
             case 'speedy':
                 this.width = 43;
@@ -71,7 +71,7 @@ class Player {
                 this.bulletSize = 10;
                 this.bulletDamage = 80; // Moderate damage
                 this.regenRate = 3; // Higher regeneration rate
-                this.bulletBounces = 3;
+                this.bulletBounces = 2;
                 break;
             case 'normal':
             default:
@@ -87,7 +87,7 @@ class Player {
                 this.bulletSize = 10;
                 this.bulletDamage = 100;
                 this.regenRate = 2; // Slightly higher regeneration rate for balance
-                this.bulletBounces = 3;
+                this.bulletBounces = 2;
                 break;
         }
 

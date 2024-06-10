@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
                 lastShotTimes[socket.id] = currentTime;
             } else {
                 // Handle case where the player is still on cooldown
-                socket.emit('blip');
+                socket.emit('blipSound');
             }
         }
     });

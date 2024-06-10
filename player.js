@@ -19,25 +19,25 @@ class Player {
                 this.hitboxWidth = 76;
                 this.hitboxHeight = 76;
                 this.moveSpeed = 7;
-                this.maxHealth = 250;
-                this.mineCooldown = 5000;
-                this.shootCooldown = 500;
-                this.bulletSpeed = 20;
+                this.maxHealth = 200; // Reduced health for balance
+                this.mineCooldown = 6000; // Slower mine cooldown
+                this.shootCooldown = 800; // Slower shooting
+                this.bulletSpeed = 15; // Slower bullets
                 this.bulletSize = 20;
-                this.bulletDamage = 200;
+                this.bulletDamage = 150; // Reduced damage
                 break;
             case 'mineLayer':
                 this.width = 43;
                 this.height = 33;
                 this.hitboxWidth = 38;
                 this.hitboxHeight = 38;
-                this.moveSpeed = 8;
-                this.maxHealth = 100;
-                this.mineCooldown = 2000;
-                this.shootCooldown = 500;
-                this.bulletSpeed = 20;
+                this.moveSpeed = 9; // Slightly faster
+                this.maxHealth = 120; // Slightly increased health
+                this.mineCooldown = 3000; // Faster mine cooldown
+                this.shootCooldown = 600; // Balanced shooting
+                this.bulletSpeed = 18; // Balanced bullet speed
                 this.bulletSize = 10;
-                this.bulletDamage = 50;
+                this.bulletDamage = 60; // Balanced damage
                 break;
             case 'sniper':
                 this.width = 43;
@@ -48,9 +48,9 @@ class Player {
                 this.maxHealth = 80;
                 this.mineCooldown = 5000;
                 this.shootCooldown = 1500;
-                this.bulletSpeed = 40;
+                this.bulletSpeed = 35; // Slightly reduced bullet speed
                 this.bulletSize = 10;
-                this.bulletDamage = 100;
+                this.bulletDamage = 120; // Slightly reduced damage
                 break;
             case 'normal':
             default:

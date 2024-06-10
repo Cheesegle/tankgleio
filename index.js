@@ -99,7 +99,6 @@ io.on('connection', (socket) => {
     });
 
         socket.on('layMine', () => {
-            console.log('mine laid!')
         let player = gameState.players[socket.id];
         if (player) {
             let currentTime = performance.now();
@@ -108,14 +107,14 @@ io.on('connection', (socket) => {
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastMineTime >= shootCooldown) {
-                io.emit('minedown');
+                io.emit('minedownSound');
                 let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
                 gameState.mines[mine.id] = mine;
                 // Update the last shot time for the player
                 lastMineTimes[socket.id] = currentTime;
             } else {
                 // Handle case where the player is still on cooldown
-                socket.emit('blip');
+                socket.emit('blipSound');
             }
         }
     });
@@ -131,7 +130,7 @@ function updatePlayers() {
         let player = gameState.players[playerId];
         if (player.health <= 0) {
             player.respawn(spawnLocations);
-            io.emit('explode');
+            io.emit('explodeSound');
         }
     }
 }
@@ -139,7 +138,7 @@ function updatePlayers() {
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
     updateBullets(gameState, gameMap, tileSize);
-    updateMines(gameState);
+    updateMines(gameState, io);
     updatePlayers();
     io.sockets.emit('state', gameState);
 }, tickRate);

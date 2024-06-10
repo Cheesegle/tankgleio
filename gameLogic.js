@@ -207,9 +207,19 @@ const updateBullets = (gameState, gameMap, tileSize) => {
     }
 };
 
+const updateMines = (gameState, io) => {
+    for (const mineId in gameState.mines) {
+        const mine = gameState.mines[mineId];
+        mine.timeleft--; // Decrement timeleft
+        if (mine.timeleft <= 0) {
+            mine.explode(gameState, io); // Explode the mine if timeleft is zero or less
+        }
+    }
+};
 
 module.exports = {
     updateMovement,
     updateBullets,
-    initMap
+    initMap,
+    updateMines
 };

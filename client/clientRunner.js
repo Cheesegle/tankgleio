@@ -32,6 +32,7 @@ function preload() {
     shootSound = loadSound('shoot.wav');
     explodeSound = loadSound('explosion.wav');
     minedownSound = loadSound('minedown.wav');
+    explodeMineSound = loadSound('explodemine.wav');
     blipSound = loadSound('blip.wav');
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
@@ -54,16 +55,20 @@ function setup() {
         shootSound.play();
     });
 
-    socket.on('explode', (state) => {
+    socket.on('explodeSound', (state) => {
         explodeSound.play();
     });
 
-    socket.on('blip', (state) => {
+    socket.on('blipSound', (state) => {
         blipSound.play();
     });
 
-    socket.on('minedown', (state) => {
+    socket.on('minedownSound', (state) => {
         minedownSound.play();
+    });
+
+    socket.on('explodeMineSound', (state) => {
+        explodeMineSound.play();
     });
 
     socket.on('mapUpdate', (serverTiles) => {
@@ -120,11 +125,11 @@ function drawMine(mine) {
 // Add a function to draw mine explosions
 function drawMineExplosions() {
     if (gameState && prevState && gameState.mines) {
-        for (let mineId in gameState.mines) {
+        for (let mineId in prevState.mines) {
             let mine = gameState.mines[mineId];
-            if (!prevState.mines || !prevState.mines[mineId]) {
+            if (!gameState.mines[mineId]) {
                 // Mine explosion effect
-                drawExplosionEffect(mine.x, mine.y, mine.explodeRadius);
+                drawExplosionEffect(prevState.mines[mineId].x, prevState.mines[mineId].y, prevState.mines[mineId].explodeRadius);
             }
         }
     }
@@ -133,9 +138,9 @@ function drawMineExplosions() {
 // Draw explosion effect
 function drawExplosionEffect(x, y, radius) {
     push();
-    noFill();
-    strokeWeight(4);
-    stroke(255, 255, 0); // Red color
+    strokeWeight(20);
+    stroke(255, 100, 0); // Red color
+    fill(255, 50, 0);
     ellipse(x, y, radius * 2);
     pop();
 }
@@ -226,7 +231,7 @@ function drawBullet(bullet) {
         } else {
             fill('red');
         }
-        ellipse(lerpedX, lerpedY, bullet.size, bullet.size);
+        ellipse(lerpedX, lerpedY, bullet.size);
         pop();
         return; // Exit the loop once the bullet is found
     }
@@ -237,7 +242,7 @@ function drawBullet(bullet) {
     } else {
         fill('red');
     }
-    ellipse(bullet.x, bullet.y, bullet.size, bullet.size);
+    ellipse(bullet.x, bullet.y, bullet.size);
     pop();
 }
 

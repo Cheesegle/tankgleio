@@ -162,7 +162,6 @@ function draw() {
 }
 
 
-
 // Draw a bullet with linear interpolation
 function drawBullet(bullet) {
     if (prevState && prevState.bullets && prevState.bullets[bullet.id]) {

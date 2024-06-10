@@ -106,7 +106,7 @@ const checkBulletPlayerCollision = (bullet, player) => {
 // Function to check collision between a bullet and a tile
 const checkBulletTileCollision = (bullet, tile) => {
     const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
-    const tileRect = new SAT.Box(new SAT.Vector(tile.x - 1, tile.y - 1), tile.width + 1, tile.height + 1).toPolygon();
+    const tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tile.width, tile.height).toPolygon();
 
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, tileRect, response);

@@ -1,9 +1,6 @@
 const SAT = require('sat');
 const rbush = require('rbush');
 
-const tileIndex = new rbush();
-
-
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
 };
@@ -14,17 +11,32 @@ const rLerp = (A, B, w) => {
     return Math.atan2(SN, CS);
 };
 
-const checkCollision = (player, tile, tileSize) => {
-    let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
-    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tileSize, tileSize).toPolygon();
+// Spatial index for tiles
+const tileIndex = new rbush();
 
-    let response = new SAT.Response();
-    let collided = SAT.testPolygonPolygon(playerRect, tileRect, response);
+// Spatial index for players
+const playerIndex = new rbush();
 
-    if (collided) {
-        // Adjust the player's position to prevent collision
-        player.x -= response.overlapV.x;
-        player.y -= response.overlapV.y;
+// Initialize the spatial index for tiles
+const initMap = (gameMap, tileSize) => {
+    for (let i = 0; i < gameMap.length; i++) {
+        for (let j = 0; j < gameMap[i].length; j++) {
+            if (gameMap[i][j] === 1) {
+                const tileBounds = {
+                    minX: j * tileSize,
+                    minY: i * tileSize,
+                    maxX: (j + 1) * tileSize,
+                    maxY: (i + 1) * tileSize,
+                    tile: {
+                        x: j * tileSize,
+                        y: i * tileSize,
+                        width: tileSize,
+                        height: tileSize
+                    }
+                };
+                tileIndex.insert(tileBounds);
+            }
+        }
     }
 };
 
@@ -88,25 +100,8 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
     movementQueue = {}; // Clear the movement queue after processing
 };
 
-
-
-// Function to check collision between a bullet and a player
-const checkBulletPlayerCollision = (bullet, player) => {
-    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
-    let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
-
-    const response = new SAT.Response();
-    const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
-
-    if (collided && bullet.owner !== player.id) {
-        player.health -= bullet.damage;
-        return true;
-    }
-
-    return false;
-};
-
-const initMap = (gameMap, tileSize) => {
+// Function to initialize the spatial index for tiles
+const initTileIndex = (gameMap, tileSize) => {
     // Populate the spatial index with tile data
     for (let i = 0; i < gameMap.length; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
@@ -127,10 +122,113 @@ const initMap = (gameMap, tileSize) => {
             }
         }
     }
-}
+};
+
+// Function to initialize the spatial index for players
+const initPlayerIndex = (gameState) => {
+    for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+        const playerBounds = {
+            minX: player.x - player.hitboxWidth / 2,
+            minY: player.y - player.hitboxHeight / 2,
+            maxX: player.x + player.hitboxWidth / 2,
+            maxY: player.y + player.hitboxHeight / 2,
+            player: player
+        };
+        playerIndex.insert(playerBounds);
+    }
+};
+
+// Function to update the spatial index for players
+const updatePlayerIndex = (gameState) => {
+    // Clear and reinsert player data in the index
+    playerIndex.clear();
+    for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+        const playerBounds = {
+            minX: player.x - player.hitboxWidth / 2,
+            minY: player.y - player.hitboxHeight / 2,
+            maxX: player.x + player.hitboxWidth / 2,
+            maxY: player.y + player.hitboxHeight / 2,
+            player: player
+        };
+        playerIndex.insert(playerBounds);
+    }
+};
+
+// Function to check collision between a player and nearby tiles using rbush
+const checkPlayerTileCollision = (player, gameMap, tileSize) => {
+    const nearbyTiles = tileIndex.search({
+        minX: player.x - player.hitboxWidth / 2,
+        minY: player.y - player.hitboxHeight / 2,
+        maxX: player.x + player.hitboxWidth / 2,
+        maxY: player.y + player.hitboxHeight / 2
+    });
+
+    for (const tile of nearbyTiles) {
+        const tileRect = tile.tile;
+        if (checkCollision(player, tileRect, tileSize)) {
+            return true; // Collision detected with a nearby tile
+        }
+    }
+
+    return false; // No collision detected with nearby tiles
+};
+
+// Function to check collision between a bullet and nearby players using rbush
+const checkBulletPlayerCollision = (bullet, gameState) => {
+    const nearbyPlayers = playerIndex.search({
+        minX: bullet.x - bullet.size / 2,
+        minY: bullet.y - bullet.size / 2,
+        maxX: bullet.x + bullet.size / 2,
+        maxY: bullet.y + bullet.size / 2
+    });
+
+    for (const playerBounds of nearbyPlayers) {
+        const player = playerBounds.player;
+        if (checkBulletPlayerCollisionSingle(bullet, player)) {
+            return true; // Collision detected with a nearby player
+        }
+    }
+
+    return false; // No collision detected with nearby players
+};
+
+// Function to check collision between a bullet and a player
+const checkBulletPlayerCollisionSingle = (bullet, player) => {
+    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
+    const playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
+
+    const response = new SAT.Response();
+    const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
+
+    if (collided && bullet.owner !== player.id) {
+        player.health -= bullet.damage;
+        return true;
+    }
+
+    return false;
+};
+
+// Function to check collision between a bullet and a tile
+const checkCollision = (player, tile, tileSize) => {
+    let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
+    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tileSize, tileSize).toPolygon();
+
+    let response = new SAT.Response();
+    let collided = SAT.testPolygonPolygon(playerRect, tileRect, response);
+
+    if (collided) {
+        // Adjust the player's position to prevent collision
+        player.x -= response.overlapV.x;
+        player.y -= response.overlapV.y;
+    }
+
+    return collided;
+};
 
 // Function to check bullet collision with nearby tiles using rbush
-const checkBulletMapCollision = (bullet, gameMap) => {
+const checkBulletMapCollision = (bullet, gameMap, tileSize) => {
     const nearbyTiles = tileIndex.search({
         minX: bullet.x - bullet.size / 2,
         minY: bullet.y - bullet.size / 2,
@@ -177,21 +275,19 @@ const updateBullets = (gameState, gameMap, tileSize) => {
         bullet.x += bullet.vx * bullet.speed;
         bullet.y += bullet.vy * bullet.speed;
 
-        // Check collision with players
-        for (const playerId in gameState.players) {
-            const player = gameState.players[playerId];
-            if (checkBulletPlayerCollision(bullet, player)) {
-                bulletsToRemove.push(bulletId);
-                break; // Exit the loop if bullet collided with a player
-            }
+        // Check collision with nearby players
+        if (checkBulletPlayerCollision(bullet, gameState)) {
+            bulletsToRemove.push(bulletId);
+            continue; // Skip further processing if bullet collided with a player
         }
 
         // Check collision with nearby tiles using rbush
-        if (checkBulletMapCollision(bullet, gameMap)) {
+        if (checkBulletMapCollision(bullet, gameMap, tileSize)) {
             if (bullet.bounces <= 0) {
                 bulletsToRemove.push(bulletId);
             }
             bullet.bounces -= 1;
+            continue; // Skip further processing if bullet collided with a tile
         }
 
         // Check if bullet is out of bounds
@@ -207,9 +303,31 @@ const updateBullets = (gameState, gameMap, tileSize) => {
     }
 };
 
+// Function to update player positions and indices
+const updatePlayers = (gameState) => {
+    for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+        // Update player position
+        // You may also want to update the player index here if player position has changed
+    }
+};
+
+// Initialize spatial indices for tiles and players
+const initSpatialIndices = (gameState, gameMap, tileSize) => {
+    initTileIndex(gameMap, tileSize);
+    initPlayerIndex(gameState);
+};
+
+// Update spatial indices for players if player positions have changed
+const updateSpatialIndices = (gameState) => {
+    updatePlayerIndex(gameState);
+};
 
 module.exports = {
     updateMovement,
     updateBullets,
-    initMap
+    initMap,
+    initSpatialIndices,
+    updateSpatialIndices,
+    updatePlayers
 };

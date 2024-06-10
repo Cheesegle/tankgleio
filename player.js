@@ -25,7 +25,8 @@ class Player {
                 this.bulletSpeed = 15; // Slower bullets
                 this.bulletSize = 20;
                 this.bulletDamage = 150; // Reduced damage
-                this.regenRate = 1;
+                this.regenRate = 2; // Slightly higher regeneration rate
+                this.bulletBounces = 3;
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -33,13 +34,14 @@ class Player {
                 this.hitboxWidth = 38;
                 this.hitboxHeight = 38;
                 this.moveSpeed = 9; // Slightly faster
-                this.maxHealth = 120; // Slightly increased health
-                this.mineCooldown = 3000; // Faster mine cooldown
+                this.maxHealth = 130; // Slightly increased health
+                this.mineCooldown = 2000; // Faster mine cooldown
                 this.shootCooldown = 600; // Balanced shooting
                 this.bulletSpeed = 18; // Balanced bullet speed
                 this.bulletSize = 10;
                 this.bulletDamage = 60; // Balanced damage
-                this.regenRate = 1;
+                this.regenRate = 3; // Higher regeneration rate
+                this.bulletBounces = 4; // Increased bullet bounces
                 break;
             case 'sniper':
                 this.width = 43;
@@ -50,10 +52,11 @@ class Player {
                 this.maxHealth = 80;
                 this.mineCooldown = 5000;
                 this.shootCooldown = 1500;
-                this.bulletSpeed = 35; // Slightly reduced bullet speed
+                this.bulletSpeed = 30; // Reduced bullet speed
                 this.bulletSize = 10;
-                this.bulletDamage = 120; // Slightly reduced damage
-                this.regenRate = 1;
+                this.bulletDamage = 120; // Reduced damage
+                this.regenRate = 2; // Slightly higher regeneration rate
+                this.bulletBounces = 3;
                 break;
             case 'speedy':
                 this.width = 43;
@@ -67,7 +70,8 @@ class Player {
                 this.bulletSpeed = 25; // Faster bullets
                 this.bulletSize = 10;
                 this.bulletDamage = 80; // Moderate damage
-                this.regenRate = 1;
+                this.regenRate = 3; // Higher regeneration rate
+                this.bulletBounces = 3;
                 break;
             case 'normal':
             default:
@@ -82,9 +86,11 @@ class Player {
                 this.bulletSpeed = 20;
                 this.bulletSize = 10;
                 this.bulletDamage = 100;
-                this.regenRate = 1;
+                this.regenRate = 2; // Slightly higher regeneration rate for balance
+                this.bulletBounces = 3;
                 break;
         }
+
 
         this.health = this.maxHealth;
     }

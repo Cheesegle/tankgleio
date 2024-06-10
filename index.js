@@ -95,7 +95,8 @@ io.on('connection', (socket) => {
                     player.id,
                     player.bulletSpeed,
                     player.bulletSize,
-                    player.bulletDamage
+                    player.bulletDamage,
+                    player.bulletBounces
                 );
                 gameState.bullets[bullet.id] = bullet;
 
@@ -146,7 +147,7 @@ function updatePlayers() {
         }
 
         if (player.health < player.maxHealth) {
-            gameState.players[playerId].health += player.regenRate;
+            gameState.players[playerId].health += (player.regenRate / 3);
         }
     }
 }

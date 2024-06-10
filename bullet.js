@@ -8,7 +8,7 @@ class Bullet {
         this.vx = vx;
         this.vy = vy;
         this.speed = 20;
-        this.size = 10; // Assuming default bullet width
+        this.size = 10;
         this.owner = owner;
         this.damage = 100;
         this.bounces = 3;

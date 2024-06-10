@@ -31,6 +31,7 @@ function preload() {
     // Load sound files
     shootSound = loadSound('shoot.wav');
     explodeSound = loadSound('explosion.wav');
+    minedownSound = loadSound('minedown.wav');
     blipSound = loadSound('blip.wav');
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
@@ -59,6 +60,10 @@ function setup() {
 
     socket.on('blip', (state) => {
         blipSound.play();
+    });
+
+    socket.on('minedown', (state) => {
+        minedownSound.play();
     });
 
     socket.on('mapUpdate', (serverTiles) => {
@@ -93,6 +98,49 @@ function startGame() {
     gameStarted = true;
 }
 
+// Add a function to draw mines
+function drawMines() {
+    if (gameState && gameState.mines) {
+        for (let mineId in gameState.mines) {
+            let mine = gameState.mines[mineId];
+            drawMine(mine);
+        }
+    }
+}
+
+// Draw a mine
+function drawMine(mine) {
+    push();
+    noStroke();
+    fill('#FFD700'); // Example mine color (gold)
+    ellipse(mine.x, mine.y, mine.size, mine.size);
+    pop();
+}
+
+// Add a function to draw mine explosions
+function drawMineExplosions() {
+    if (gameState && prevState && gameState.mines) {
+        for (let mineId in gameState.mines) {
+            let mine = gameState.mines[mineId];
+            if (!prevState.mines || !prevState.mines[mineId]) {
+                // Mine explosion effect
+                drawExplosionEffect(mine.x, mine.y, mine.explodeRadius);
+            }
+        }
+    }
+}
+
+// Draw explosion effect
+function drawExplosionEffect(x, y, radius) {
+    push();
+    noFill();
+    strokeWeight(4);
+    stroke(255, 255, 0); // Red color
+    ellipse(x, y, radius * 2);
+    pop();
+}
+
+// Update the draw() function to call these new functions
 function draw() {
     if (!gameStarted) {
         return; // Skip drawing if the game hasn't started
@@ -144,6 +192,10 @@ function draw() {
         }
     }
 
+    // Draw mines and mine explosions
+    drawMines();
+    drawMineExplosions();
+
     // Draw the players that the server sent
     if (gameState && gameState.players && prevState) {
         for (let playerId in gameState.players) {
@@ -193,6 +245,12 @@ function mouseClicked() {
     if (gameStarted) {
         socket.emit('shoot');
     }
+}
+
+function keyPressed(){
+if (key === ' '){
+    socket.emit('layMine'); 
+  }
 }
 
 // Draw a player tank

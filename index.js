@@ -5,7 +5,8 @@ const path = require('path');
 
 const Player = require('./player');
 const Bullet = require('./bullet'); // Import the Bullet class
-const { updateMovement, updateBullets, initMap } = require('./gameLogic');
+const Mine = require('./mine');
+const { updateMovement, updateBullets, initMap, updateMines } = require('./gameLogic');
 const { generateMap } = require('./mapGenerator');
 
 const app = express();
@@ -24,7 +25,8 @@ initMap(gameMap, tileSize);
 
 const gameState = {
     players: {},
-    bullets: {}
+    bullets: {},
+    mines: {}
 };
 
 function truncateString(str, num) {
@@ -55,16 +57,18 @@ for (let i = 0; i < 5; i++) {
     spawnLocations.push(getRandomEmptyLocation());
 }
 
-let movementQueue = {}; // Object to store movement updates
+var movementQueue = {}; // Object to store movement updates
 
 // Store the last shooting time for each player
-const lastShotTimes = {};
+var lastShotTimes = {};
+
+var lastMineTimes = {};
 
 io.on('connection', (socket) => {
     socket.on('newPlayer', (data) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        const newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30));
+        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30));
         gameState.players[socket.id] = newPlayer;
     });
 
@@ -73,20 +77,42 @@ io.on('connection', (socket) => {
     });
 
     socket.on('shoot', () => {
-        const player = gameState.players[socket.id];
+        let player = gameState.players[socket.id];
         if (player) {
-            const currentTime = performance.now();
-            const lastShotTime = lastShotTimes[socket.id] || 0;
-            const shootCooldown = 500; // Adjust cooldown time in milliseconds
+            let currentTime = performance.now();
+            let lastShotTime = lastShotTimes[socket.id] || 0;
+            let shootCooldown = 500; // Adjust cooldown time in milliseconds
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastShotTime >= shootCooldown) {
                 io.emit('shot');
-                const bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, Math.cos(player.turretAngle), Math.sin(player.turretAngle), player.id);
+                let bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, Math.cos(player.turretAngle), Math.sin(player.turretAngle), player.id);
                 gameState.bullets[bullet.id] = bullet;
 
                 // Update the last shot time for the player
                 lastShotTimes[socket.id] = currentTime;
+            } else {
+                // Handle case where the player is still on cooldown
+                socket.emit('blip');
+            }
+        }
+    });
+
+        socket.on('layMine', () => {
+            console.log('mine laid!')
+        let player = gameState.players[socket.id];
+        if (player) {
+            let currentTime = performance.now();
+            let lastMineTime = lastMineTimes[socket.id] || 0;
+            let shootCooldown = 5000; // Adjust cooldown time in milliseconds
+
+            // Check if enough time has passed since the last shot
+            if (currentTime - lastMineTime >= shootCooldown) {
+                io.emit('minedown');
+                let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
+                gameState.mines[mine.id] = mine;
+                // Update the last shot time for the player
+                lastMineTimes[socket.id] = currentTime;
             } else {
                 // Handle case where the player is still on cooldown
                 socket.emit('blip');
@@ -113,6 +139,7 @@ function updatePlayers() {
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
     updateBullets(gameState, gameMap, tileSize);
+    updateMines(gameState);
     updatePlayers();
     io.sockets.emit('state', gameState);
 }, tickRate);

@@ -139,15 +139,15 @@ io.on('connection', (socket) => {
 function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
+        
+        if (player.health < player.maxHealth) {
+            gameState.players[playerId].health += (player.regenRate / 3);
+        }
         if (player.health <= 0) {
             delete gameState.players[playerId];
             delete movementQueue[playerId];
             io.to(player.id).emit('dead');
             io.emit('explodeSound');
-        }
-
-        if (player.health < player.maxHealth) {
-            gameState.players[playerId].health += (player.regenRate / 3);
         }
     }
 }

@@ -2,9 +2,9 @@ class Tank {
     constructor(x, y, angle, turretAngle, color, turretColor, width, height) {
         this.width = width;
         this.height = height;
-        this.turretBaseSide = 19;
-        this.turretNozzleWidth = 21;
-        this.turretNozzleHeight = 10;
+        this.turretBaseSide = width * (19/43);
+        this.turretNozzleWidth = width * (21/43);
+        this.turretNozzleHeight = width * (10/43);
 
         this.x = x;
         this.y = y;

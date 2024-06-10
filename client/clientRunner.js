@@ -95,11 +95,16 @@ function startGame() {
         return;
     }
 
+    const tankType = document.getElementById('tankTypeSelector').value;
+
     // Hide the start menu
     document.getElementById('startMenu').style.display = 'none';
 
     // Join the game with the username
-    socket.emit('newPlayer', { username: username });
+    socket.emit('newPlayer', {
+        username: username,
+        tankType: tankType
+    });
     gameStarted = true;
 }
 
@@ -117,7 +122,7 @@ function drawMines() {
 function drawMine(mine) {
     push();
     noStroke();
-    fill('#FFD700'); // Example mine color (gold)
+    fill('#FFD700');
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
 }
@@ -229,7 +234,7 @@ function drawBullet(bullet) {
         if (bullet.owner === socket.id) {
             fill('green');
         } else {
-            fill('red');
+            fill('white');
         }
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
@@ -240,7 +245,7 @@ function drawBullet(bullet) {
     if (bullet.owner === socket.id) {
         fill('green');
     } else {
-        fill('red');
+        fill('white');
     }
     ellipse(bullet.x, bullet.y, bullet.size);
     pop();
@@ -252,10 +257,10 @@ function mouseClicked() {
     }
 }
 
-function keyPressed(){
-if (key === ' '){
-    socket.emit('layMine'); 
-  }
+function keyPressed() {
+    if (key === ' ') {
+        socket.emit('layMine');
+    }
 }
 
 // Draw a player tank

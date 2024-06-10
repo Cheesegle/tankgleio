@@ -1,16 +1,16 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Bullet {
-    constructor(x, y, vx, vy, owner) {
+    constructor(x, y, vx, vy, owner, speed, size, damage) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
-        this.speed = 20;
-        this.size = 10;
+        this.speed = speed;
+        this.size = size;
         this.owner = owner;
-        this.damage = 100;
+        this.damage = damage;
         this.bounces = 3;
     }
 

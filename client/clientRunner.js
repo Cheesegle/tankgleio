@@ -75,6 +75,10 @@ function setup() {
         tiles = serverTiles;
     });
 
+    socket.on('dead', (state) => {
+        document.getElementById('startMenu').style.display = 'block';;
+    });
+
     // Listen to the server and draw the players
     socket.on('state', (state) => {
         if (gameStarted) {
@@ -95,11 +99,16 @@ function startGame() {
         return;
     }
 
+    const tankType = document.getElementById('tankTypeSelector').value;
+
     // Hide the start menu
     document.getElementById('startMenu').style.display = 'none';
 
     // Join the game with the username
-    socket.emit('newPlayer', { username: username });
+    socket.emit('newPlayer', {
+        username: username,
+        tankType: tankType
+    });
     gameStarted = true;
 }
 
@@ -117,7 +126,7 @@ function drawMines() {
 function drawMine(mine) {
     push();
     noStroke();
-    fill('#FFD700'); // Example mine color (gold)
+    fill('#FFD700');
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
 }
@@ -229,7 +238,7 @@ function drawBullet(bullet) {
         if (bullet.owner === socket.id) {
             fill('green');
         } else {
-            fill('red');
+            fill('white');
         }
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
@@ -240,7 +249,7 @@ function drawBullet(bullet) {
     if (bullet.owner === socket.id) {
         fill('green');
     } else {
-        fill('red');
+        fill('white');
     }
     ellipse(bullet.x, bullet.y, bullet.size);
     pop();
@@ -252,10 +261,10 @@ function mouseClicked() {
     }
 }
 
-function keyPressed(){
-if (key === ' '){
-    socket.emit('layMine'); 
-  }
+function keyPressed() {
+    if (key === ' ') {
+        socket.emit('layMine');
+    }
 }
 
 // Draw a player tank
@@ -278,12 +287,29 @@ function drawPlayer(player, playerId) {
         fill(255);
         textAlign(CENTER);
         textSize(16);
-        textFont(customFont); // Use the custom font
-        textAlign(CENTER);
-        text(player.username, tank.x + tank.width / 2, tank.y - 25); // Display the username above the tank
+        textFont(customFont);
+        text(player.username, tank.x + tank.width / 2, tank.y - 25);
+        pop();
+
+        // Draw the health bar
+        const healthBarWidth = tank.width;
+        const healthBarHeight = 8;
+        const healthBarX = tank.x;
+        const healthBarY = tank.y - 15;
+
+        push();
+        fill(255, 0, 0);
+        rect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+        pop();
+
+        const currentHealthWidth = (player.health / player.maxHealth) * healthBarWidth;
+        push();
+        fill(0, 255, 0);
+        rect(healthBarX, healthBarY, currentHealthWidth, healthBarHeight);
         pop();
     }
 }
+
 
 function updateZoom() {
     // Interpolate towards the target scaling factor

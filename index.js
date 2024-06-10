@@ -30,11 +30,11 @@ const gameState = {
 };
 
 function truncateString(str, num) {
-  if (str.length > num) {
-    return str.slice(0, num) + "...";
-  } else {
-    return str;
-  }
+    if (str.length > num) {
+        return str.slice(0, num) + "...";
+    } else {
+        return str;
+    }
 }
 
 const getRandomEmptyLocation = () => {
@@ -66,10 +66,10 @@ var lastMineTimes = {};
 
 io.on('connection', (socket) => {
     socket.on('newPlayer', (data) => {
-        if(!data.username) return;
+        if (!data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30));
+        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30), data.tankType);
         gameState.players[socket.id] = newPlayer;
     });
 
@@ -82,12 +82,21 @@ io.on('connection', (socket) => {
         if (player) {
             let currentTime = performance.now();
             let lastShotTime = lastShotTimes[socket.id] || 0;
-            let shootCooldown = 500; // Adjust cooldown time in milliseconds
+            let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastShotTime >= shootCooldown) {
                 io.emit('shot');
-                let bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, Math.cos(player.turretAngle), Math.sin(player.turretAngle), player.id);
+                let bullet = new Bullet(
+                    player.x + player.width / 2,
+                    player.y + player.height / 2,
+                    Math.cos(player.turretAngle),
+                    Math.sin(player.turretAngle),
+                    player.id,
+                    player.bulletSpeed,
+                    player.bulletSize,
+                    player.bulletDamage
+                );
                 gameState.bullets[bullet.id] = bullet;
 
                 // Update the last shot time for the player
@@ -99,15 +108,15 @@ io.on('connection', (socket) => {
         }
     });
 
-        socket.on('layMine', () => {
+    socket.on('layMine', () => {
         let player = gameState.players[socket.id];
         if (player) {
             let currentTime = performance.now();
             let lastMineTime = lastMineTimes[socket.id] || 0;
-            let shootCooldown = 5000; // Adjust cooldown time in milliseconds
+            let mineCooldown = player.mineCooldown; // Adjust cooldown time in milliseconds
 
             // Check if enough time has passed since the last shot
-            if (currentTime - lastMineTime >= shootCooldown) {
+            if (currentTime - lastMineTime >= mineCooldown) {
                 io.emit('minedownSound');
                 let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
                 gameState.mines[mine.id] = mine;
@@ -130,7 +139,9 @@ function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
         if (player.health <= 0) {
-            player.respawn(spawnLocations);
+            delete gameState.players[playerId];
+            delete movementQueue[playerId];
+            io.to(player.id).emit('dead');
             io.emit('explodeSound');
         }
     }

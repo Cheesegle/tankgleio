@@ -154,8 +154,8 @@ function draw() {
 
     // Draw bullets
     if (gameState && gameState.bullets) {
-        for (let i = 0; i < gameState.bullets.length; i++) {
-            let bullet = gameState.bullets[i];
+        for (let bulletId in gameState.bullets) {
+            let bullet = gameState.bullets[bulletId];
             drawBullet(bullet);
         }
     }
@@ -165,23 +165,19 @@ function draw() {
 
 // Draw a bullet with linear interpolation
 function drawBullet(bullet) {
-    if (prevState && prevState.bullets) {
-        for (let i = 0; i < prevState.bullets.length; i++) {
-            if (prevState.bullets[i].id === bullet.id) {
-                const prevBullet = prevState.bullets[i];
-                const lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
-                const lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
-                push();
-                if (bullet.owner === socket.id) {
-                    fill('green');
-                } else {
-                    fill('red');
-                }
-                ellipse(lerpedX, lerpedY, bullet.size, bullet.size);
-                pop();
-                return; // Exit the loop once the bullet is found
-            }
+    if (prevState && prevState.bullets && prevState.bullets[bullet.id]) {
+        let prevBullet = prevState.bullets[bullet.id];
+        let lerpedX = lerp(prevBullet.x, bullet.x, lastTickDiff);
+        let lerpedY = lerp(prevBullet.y, bullet.y, lastTickDiff);
+        push();
+        if (bullet.owner === socket.id) {
+            fill('green');
+        } else {
+            fill('red');
         }
+        ellipse(lerpedX, lerpedY, bullet.size, bullet.size);
+        pop();
+        return; // Exit the loop once the bullet is found
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();

@@ -22,7 +22,7 @@ const gameMap = generateMap(50, 50, 10, 0.5);
 
 const gameState = {
     players: {},
-    bullets: []
+    bullets: {}
 };
 
 function truncateString(str, num) {
@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
             if (currentTime - lastShotTime >= shootCooldown) {
                 io.emit('shot');
                 const bullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, Math.cos(player.turretAngle), Math.sin(player.turretAngle), player.id);
-                gameState.bullets.push(bullet);
+                gameState.bullets[bullet.id] = bullet;
 
                 // Update the last shot time for the player
                 lastShotTimes[socket.id] = currentTime;

@@ -287,12 +287,29 @@ function drawPlayer(player, playerId) {
         fill(255);
         textAlign(CENTER);
         textSize(16);
-        textFont(customFont); // Use the custom font
-        textAlign(CENTER);
-        text(player.username, tank.x + tank.width / 2, tank.y - 25); // Display the username above the tank
+        textFont(customFont);
+        text(player.username, tank.x + tank.width / 2, tank.y - 25);
+        pop();
+
+        // Draw the health bar
+        const healthBarWidth = tank.width;
+        const healthBarHeight = 8;
+        const healthBarX = tank.x;
+        const healthBarY = tank.y - 15;
+
+        push();
+        fill(255, 0, 0);
+        rect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+        pop();
+
+        const currentHealthWidth = (player.health / player.maxHealth) * healthBarWidth;
+        push();
+        fill(0, 255, 0);
+        rect(healthBarX, healthBarY, currentHealthWidth, healthBarHeight);
         pop();
     }
 }
+
 
 function updateZoom() {
     // Interpolate towards the target scaling factor

@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         if (!data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30), data.tankType);
+        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType);
         gameState.players[socket.id] = newPlayer;
     });
 

@@ -1,11 +1,10 @@
 class Player {
-    constructor(x, y, angle, turretAngle, color, turretColor, id, username, tankType = 'normal') {
+    constructor(x, y, angle, turretAngle, id, username, tankType = 'normal') {
         this.x = x || 0;
         this.y = y || 0;
         this.angle = angle || 0;
         this.turretAngle = turretAngle || 0;
-        this.color = color || 'red';
-        this.turretColor = turretColor || 'gray';
+        this.turretColor = 'gray';
         this.id = id;
         this.username = username;
         this.bullets = [];
@@ -27,6 +26,7 @@ class Player {
                 this.bulletDamage = 150; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
+                this.color = 'blue';
                 break;
             case 'mineLayer':
                 this.width = 43;
@@ -42,6 +42,7 @@ class Player {
                 this.bulletDamage = 60; // Balanced damage
                 this.regenRate = 3; // Higher regeneration rate
                 this.bulletBounces = 4; // Increased bullet bounces
+                this.color = 'pink';
                 break;
             case 'sniper':
                 this.width = 43;
@@ -57,6 +58,7 @@ class Player {
                 this.bulletDamage = 120; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
+                this.color = 'red';
                 break;
             case 'speedy':
                 this.width = 43;
@@ -72,6 +74,7 @@ class Player {
                 this.bulletDamage = 80; // Moderate damage
                 this.regenRate = 3; // Higher regeneration rate
                 this.bulletBounces = 2;
+                this.color = 'yellow';
                 break;
             case 'normal':
             default:
@@ -88,6 +91,7 @@ class Player {
                 this.bulletDamage = 100;
                 this.regenRate = 2; // Slightly higher regeneration rate for balance
                 this.bulletBounces = 2;
+                this.color = 'orange';
                 break;
         }
 

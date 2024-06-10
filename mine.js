@@ -5,7 +5,7 @@ class Mine {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
-        this.explodeRadius = 100;
+        this.explodeRadius = 200;
         this.size = 20;
         this.owner = owner;
         this.damage = 100;

@@ -207,19 +207,19 @@ function draw() {
         }
     }
 
-    // Draw the players that the server sent
-    if (gameState && gameState.players && prevState) {
-        for (let playerId in gameState.players) {
-            let player = gameState.players[playerId];
-            drawPlayer(player, playerId);
-        }
-    }
-
     // Draw bullets
     if (gameState && gameState.bullets) {
         for (let bulletId in gameState.bullets) {
             let bullet = gameState.bullets[bulletId];
             drawBullet(bullet);
+        }
+    }
+
+    // Draw the players that the server sent
+    if (gameState && gameState.players && prevState) {
+        for (let playerId in gameState.players) {
+            let player = gameState.players[playerId];
+            drawPlayer(player, playerId);
         }
     }
 

@@ -43,8 +43,8 @@ class Tank {
 
         // Draw tank sides
         fill("#272727");
-        rect(0, -13, this.width, this.height / 6);
-        rect(0, 13, this.width, this.height / 6);
+        rect(0, -this.height / 2.4, this.width, this.height / 6);
+        rect(0, this.height / 2.4, this.width, this.height / 6);
 
         // Draw tank turret
         push();

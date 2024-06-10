@@ -66,6 +66,7 @@ var lastMineTimes = {};
 
 io.on('connection', (socket) => {
     socket.on('newPlayer', (data) => {
+        if(!data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
         let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, 'red', 'grey', socket.id, truncateString(data.username, 30));

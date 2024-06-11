@@ -49,17 +49,6 @@ const getRandomEmptyLocation = (yMin, yMax) => {
     return emptyLocations[Math.floor(Math.random() * emptyLocations.length)];
 };
 
-const redSpawnLocations = [];
-const blueSpawnLocations = [];
-
-for (let i = 0; i < 5; i++) {
-    redSpawnLocations.push(getRandomEmptyLocation(0, 10));
-}
-
-for (let i = 0; i < 5; i++) {
-    blueSpawnLocations.push(getRandomEmptyLocation(gameMap.length - 10, gameMap.length));
-}
-
 var movementQueue = {};
 
 var lastShotTimes = {};
@@ -81,9 +70,9 @@ io.on('connection', (socket) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
         if (team === 'red') {
-            spawnLocation = redSpawnLocations[Math.floor(Math.random() * redSpawnLocations.length)];
+            spawnLocation = getRandomEmptyLocation(0, 10);
         } else {
-            spawnLocation = blueSpawnLocations[Math.floor(Math.random() * blueSpawnLocations.length)];
+            spawnLocation = getRandomEmptyLocation(gameMap.length - 10, gameMap.length)
         }
         let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;

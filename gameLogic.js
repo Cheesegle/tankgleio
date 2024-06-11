@@ -172,7 +172,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
         let bullet = gameState.bullets[bulletId];
 
         //sub-stepping (whatever its called)
-        const steps = 10;
+        const steps = bullet.speed / 2;
         const stepSize = bullet.speed / steps;
         let collided = false;
 

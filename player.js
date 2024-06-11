@@ -1,5 +1,5 @@
 class Player {
-    constructor(x, y, angle, turretAngle, id, username, tankType = 'normal') {
+    constructor(x, y, angle, turretAngle, id, username, tankType = 'normal', team) {
         this.x = x || 0;
         this.y = y || 0;
         this.angle = angle || 0;
@@ -9,6 +9,7 @@ class Player {
         this.username = username;
         this.bullets = [];
         this.tankType = tankType;
+        this.team = team;
 
         // Set properties based on the tank type
         switch (tankType) {

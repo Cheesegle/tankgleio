@@ -65,11 +65,17 @@ var lastShotTimes = {};
 var lastMineTimes = {};
 
 io.on('connection', (socket) => {
+    let team;
+    if(Math.random() < 0.5){
+        team = 'alpha';
+    } else {
+        team = 'bravo';
+    }
     socket.on('newPlayer', (data) => {
         if (!data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType);
+        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;
     });
 
@@ -96,7 +102,8 @@ io.on('connection', (socket) => {
                     player.bulletSpeed,
                     player.bulletSize,
                     player.bulletDamage,
-                    player.bulletBounces
+                    player.bulletBounces,
+                    player.team
                 );
                 gameState.bullets[bullet.id] = bullet;
 

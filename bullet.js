@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Bullet {
-    constructor(x, y, vx, vy, owner, speed, size, damage, bounces) {
+    constructor(x, y, vx, vy, owner, speed, size, damage, bounces, team) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
@@ -12,6 +12,7 @@ class Bullet {
         this.owner = owner;
         this.damage = damage;
         this.bounces = bounces;
+        this.team = team;
     }
 
     move() {

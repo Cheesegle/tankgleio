@@ -227,7 +227,6 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                         bullet.damage = subtractedDamages;
                     } else if (subtractedDamages < 0) {
                         bulletsToRemove.push(bullet.id);
-                        otherBullet.damage = -subtractedDamages;
                     } else {
                         bulletsToRemove.push(otherBullet.id);
                         bulletsToRemove.push(bullet.id);

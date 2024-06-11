@@ -54,7 +54,9 @@ const gameState = {
     players: {},
     bullets: {},
     mines: {},
-    hardPoint: generateHardPoint()
+    hardPoint: generateHardPoint(),
+    redTeamScore: 0,
+    blueTeamScore: 0
 };
 
 function truncateString(str, num) {
@@ -97,7 +99,7 @@ io.on('connection', (socket) => {
         if (!data || !data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
-            spawnLocation = getRandomEmptyLocation(0, gameMap.length);
+        spawnLocation = getRandomEmptyLocation(0, gameMap.length);
         let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;
     });
@@ -172,6 +174,19 @@ function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
 
+        // Check if the player is on a hard point
+        if (isPlayerOnHardPoint(player)) {
+            // Add score to the player's team
+            if (player.team === 'red') {
+                // Increment red team score
+                gameState.redTeamScore++;
+            } else {
+                // Increment blue team score
+                gameState.blueTeamScore++;
+            }
+        }
+
+        // Other player updates
         if (player.health < player.maxHealth) {
             gameState.players[playerId].health += (player.regenRate / 3);
         }
@@ -182,6 +197,13 @@ function updatePlayers() {
             io.emit('explodeSound');
         }
     }
+}
+
+function isPlayerOnHardPoint(player) {
+    // Assuming hard points are represented by value 2 in the game map
+    const tileX = Math.floor((player.x + player.width / 2) / tileSize);
+    const tileY = Math.floor((player.y + player.height / 2) / tileSize);
+    return gameMap[tileY][tileX] === 2;
 }
 
 setInterval(() => {

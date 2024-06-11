@@ -187,15 +187,14 @@ function drawExplosionEffect(x, y, radius) {
     pop();
 }
 
-// Update the draw() function to call these new functions
 function draw() {
-    if (!gameStarted) {
-        return; // Skip drawing if the game hasn't started
-    }
+    if (!gameStarted) return;
+    if (!gameState) return;
 
     // Clear the canvas
     clear();
 
+    push();
     updateZoom();
 
     // Apply scaling
@@ -245,7 +244,6 @@ function draw() {
 
     drawMines();
 
-
     // Draw bullets
     if (gameState && gameState.bullets) {
         for (let bulletId in gameState.bullets) {
@@ -278,6 +276,19 @@ function draw() {
     }
 
     drawMineExplosions();
+    pop();
+    // Draw scoreboard
+    drawScoreboard();
+}
+
+function drawScoreboard() {
+    push();
+    textAlign(RIGHT, TOP);
+    textSize(20);
+    fill(255);
+    text(`Red Team: ${gameState.redTeamScore || 0}`, width - 20, 20);
+    text(`Blue Team: ${gameState.blueTeamScore || 0}`, width - 20, 50);
+    pop();
 }
 
 

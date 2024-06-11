@@ -37,39 +37,55 @@ function truncateString(str, num) {
     }
 }
 
-const getRandomEmptyLocation = () => {
+const getRandomEmptyLocation = (yMin, yMax) => {
     const emptyLocations = [];
-    for (let i = 0; i < gameMap.length; i++) {
+    for (let i = yMin; i < yMax; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
             if (gameMap[i][j] === 0) {
-                // If the tile is empty, add its coordinates to the list of empty locations
                 emptyLocations.push({ x: j * tileSize, y: i * tileSize });
             }
         }
     }
-    // Choose a random empty location from the list
     return emptyLocations[Math.floor(Math.random() * emptyLocations.length)];
 };
 
-var spawnLocations = [];
-// Generate 5 random spawn locations
+const redSpawnLocations = [];
+const blueSpawnLocations = [];
+
 for (let i = 0; i < 5; i++) {
-    spawnLocations.push(getRandomEmptyLocation());
+    redSpawnLocations.push(getRandomEmptyLocation(0, 10));
 }
 
-var movementQueue = {}; // Object to store movement updates
+for (let i = 0; i < 5; i++) {
+    blueSpawnLocations.push(getRandomEmptyLocation(gameMap.length - 10, gameMap.length));
+}
 
-// Store the last shooting time for each player
+var movementQueue = {};
+
 var lastShotTimes = {};
 
 var lastMineTimes = {};
 
 io.on('connection', (socket) => {
+    let team;
+    if (Math.random() < 0.5) {
+        team = 'red';
+    } else {
+        team = 'blue';
+    }
+
+    socket.emit('team', team);
+
     socket.on('newPlayer', (data) => {
         if (!data.username) return;
         socket.emit('mapUpdate', gameMap);
-        let spawnLocation = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType);
+        let spawnLocation;
+        if (team === 'red') {
+            spawnLocation = redSpawnLocations[Math.floor(Math.random() * redSpawnLocations.length)];
+        } else {
+            spawnLocation = blueSpawnLocations[Math.floor(Math.random() * blueSpawnLocations.length)];
+        }
+        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;
     });
 
@@ -96,7 +112,8 @@ io.on('connection', (socket) => {
                     player.bulletSpeed,
                     player.bulletSize,
                     player.bulletDamage,
-                    player.bulletBounces
+                    player.bulletBounces,
+                    player.team
                 );
                 gameState.bullets[bullet.id] = bullet;
 
@@ -130,6 +147,15 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('switchTeam', () => {
+        if (team === 'blue') {
+            team = 'red';
+        } else {
+            team = 'blue';
+        }
+        socket.emit('team', team);
+    });
+
     socket.on('disconnect', () => {
         delete gameState.players[socket.id];
         delete movementQueue[socket.id];
@@ -139,7 +165,7 @@ io.on('connection', (socket) => {
 function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
-        
+
         if (player.health < player.maxHealth) {
             gameState.players[playerId].health += (player.regenRate / 3);
         }

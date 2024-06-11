@@ -96,7 +96,7 @@ const checkBulletPlayerCollision = (bullet, player) => {
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
 
-    if (collided && bullet.owner !== player.id) {
+    if (collided && bullet.owner !== player.id && bullet.team !== player.team) {
         player.health -= bullet.damage;
         return true;
     }
@@ -180,8 +180,8 @@ const updateBullets = (gameState, gameMap, tileSize) => {
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
 
-        // Sub-stepping
-        const steps = 12;
+        //sub-stepping (whatever its called)
+        const steps = bullet.speed / 2;
         const stepSize = bullet.speed / steps;
         let collided = false;
 

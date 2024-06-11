@@ -1,4 +1,4 @@
-let socket;
+let socket = io();
 let gameState = null;
 let prevState = null;
 let lastTick = null;
@@ -44,12 +44,27 @@ function soundLoaded(){
     new p5.Reverb().process(explodeMineSound, 1, 1);
     //...
 }
+
+function switchTeam() {
+    socket.emit('switchTeam');
+}
+
+
+socket.on('team', (team) => {
+    const switchTeamButton = document.getElementById('switchTeamButton');
+    if (team === 'red') {
+        switchTeamButton.style.setProperty('background-color', 'red', 'important');
+    } else if (team === 'blue') {
+        switchTeamButton.style.setProperty('background-color', 'blue', 'important');
+    } else {
+        switchTeamButton.style.setProperty('background-color', 'gray', 'important');
+    }
+});
+
+
 function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
-
-    // Initialize socket.io
-    socket = io();
 
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';
@@ -316,7 +331,8 @@ function drawPlayer(player, playerId) {
             player.color,
             player.turretColor,
             player.width,
-            player.height
+            player.height,
+            player.team
         );
         tank.render();
 

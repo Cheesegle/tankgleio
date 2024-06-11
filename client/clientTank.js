@@ -1,5 +1,5 @@
 class Tank {
-    constructor(x, y, angle, turretAngle, color, turretColor, width, height) {
+    constructor(x, y, angle, turretAngle, color, turretColor, width, height, team) {
         this.width = width;
         this.height = height;
         this.turretBaseSide = width * (19/43);
@@ -13,6 +13,7 @@ class Tank {
         this.color = color;
         this.turretColor = turretColor;
         this.dead = false;
+        this.team = team;
     }
 
     render() {
@@ -31,7 +32,8 @@ class Tank {
         pop();
 
         push();
-        //stroke();
+
+        stroke(this.team);
 
         translate(centerX, centerY);
         rotate(this.angle);

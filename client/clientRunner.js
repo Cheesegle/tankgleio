@@ -40,7 +40,7 @@ function preload() {
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
 
-function soundLoaded(){
+function soundLoaded() {
     new p5.Reverb().process(explodeMineSound, 1, 1);
     //...
 }
@@ -109,9 +109,9 @@ function setup() {
             gameState = state;
         }
     });
-    
+
     socket.on('explodeBullet', (pos) => {
-        if(typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)){
+        if (typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)) {
             //todo effects maybe
             bulletBulletSound.play();
         }
@@ -296,11 +296,8 @@ function drawBullet(bullet) {
     fill(SHADOW);
     ellipse(bullet.x + 2, bullet.y + 2, bullet.size);
 
-    if (bullet.owner === socket.id) {
-        fill('green');
-    } else {
-        fill('white');
-    }
+    fill(bullet.team);
+
     ellipse(bullet.x, bullet.y, bullet.size);
     pop();
 }

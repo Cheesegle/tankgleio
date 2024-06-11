@@ -1,8 +1,8 @@
 const SAT = require('sat');
 const rbush = require('rbush');
 
-const tileIndex = new rbush();
-const bulletIndex = new rbush();
+var tileIndex = new rbush();
+var bulletIndex = new rbush();
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -176,6 +176,7 @@ const checkBulletTileCollision = (bullet, tile) => {
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
     let blowup = false;
+    bulletIndex = new rbush();
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
@@ -197,7 +198,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                     break;
                 }
             }
-            
+
             // Check collision with nearby tiles using rbush
             if (checkBulletMapCollision(bullet, gameMap)) {
                 if (bullet.bounces <= 0) {
@@ -240,14 +241,6 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 bulletsToRemove.push(bulletId);
                 break;
             }
-
-            bulletIndex.remove({
-                minX: bullet.x - bullet.size / 2,
-                minY: bullet.y - bullet.size / 2,
-                maxX: bullet.x + bullet.size / 2,
-                maxY: bullet.y + bullet.size / 2,
-                bullet: bullet
-            }, (a, b) => a.bullet.id === b.bullet.id);
 
             bulletIndex.insert({
                 minX: bullet.x - bullet.size / 2,

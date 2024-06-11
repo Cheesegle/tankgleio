@@ -30,15 +30,20 @@ function rLerp(A, B, w) {
 
 function preload() {
     // Load sound files
-    shootSound = loadSound('shoot.wav');
-    explodeSound = loadSound('explosion.wav');
-    minedownSound = loadSound('minedown.wav');
-    explodeMineSound = loadSound('explodemine.wav');
-    blipSound = loadSound('blip.wav');
+    shootSound = loadSound('shoot.wav', soundLoaded);
+    explodeSound = loadSound('explosion.wav', soundLoaded);
+    bulletBulletSound = loadSound('explosion.wav', soundLoaded);
+    minedownSound = loadSound('minedown.wav', soundLoaded);
+    explodeMineSound = loadSound('explodemine.wav', soundLoaded);
+    blipSound = loadSound('blip.wav', soundLoaded);
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
 
+function soundLoaded(){
+    new p5.Reverb().process(explodeMineSound, 1, 1);
+    //...
+}
 function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
@@ -89,6 +94,13 @@ function setup() {
             gameState = state;
         }
     });
+    
+    socket.on('explodeBullet', (pos) => {
+        if(typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)){
+            //todo effects maybe
+            bulletBulletSound.play();
+        }
+    })
 }
 
 function startGame() {

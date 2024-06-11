@@ -21,7 +21,6 @@ const keyDownHandler = (e) => {
     } else if (e.keyCode == 38 || e.keyCode == 87) {
         playerMovement.up = true;
     } else if (e.keyCode == 40 || e.keyCode == 83) {
-
         playerMovement.down = true;
     }
 };

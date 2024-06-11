@@ -154,7 +154,11 @@ function updatePlayers() {
 
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
-    updateBullets(gameState, gameMap, tileSize);
+    let blownup = updateBullets(gameState, gameMap, tileSize);
+    console.log(blownup)
+    if(blownup){
+        io.emit("explodeBullet", blownup);
+    }
     updateMines(gameState, io);
     updatePlayers();
     io.sockets.emit('state', gameState);

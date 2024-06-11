@@ -222,13 +222,9 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 
-                    if (subtractedDamages === 0) {
+                    if (subtractedDamages <= 0) {
                         bulletsToRemove.push(otherBullet.id);
                         bulletsToRemove.push(bulletId);
-                    } else {
-                        subtractedDamages > 0 ?
-                            bulletsToRemove.push(otherBullet.id) :
-                            bulletsToRemove.push(bulletId);
                     }
 
                     blowup = { x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2 };

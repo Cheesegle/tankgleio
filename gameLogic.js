@@ -238,9 +238,6 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 }
             }
 
-
-            if (collided) break;
-
             if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
                 bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
                 bulletsToRemove.push(bulletId);

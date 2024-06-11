@@ -9,6 +9,8 @@ let playerCameraX = 0;
 let playerCameraY = 0;
 let lerpedPlayerX = 0;
 let lerpedPlayerY = 0;
+let playerWidth = 0;
+let playerHeight = 0;
 const cameraLerpAmount = 0.07;
 let gameStarted = false;
 let username = '';
@@ -137,7 +139,10 @@ function startGame() {
         username: username,
         tankType: tankType
     });
-    gameStarted = true;
+    setTimeout(() => {
+        gameStarted = true;
+    }, 10);
+
 }
 
 // Add a function to draw mines
@@ -209,6 +214,8 @@ function draw() {
         if (gameState.players[socket.id] && prevState.players[socket.id]) {
             lerpedPlayerX = lerp(prevState.players[socket.id].x, gameState.players[socket.id].x, lastTickDiff);
             lerpedPlayerY = lerp(prevState.players[socket.id].y, gameState.players[socket.id].y, lastTickDiff);
+            playerWidth = gameState.players[socket.id].width;
+            playerHeight = gameState.players[socket.id].height;
         }
     }
 

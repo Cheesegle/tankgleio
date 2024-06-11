@@ -198,7 +198,24 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 }
             }
 
-            if (collided) break;
+            if (collided){
+                bulletIndex.remove({
+                    minX: bullet.x - bullet.size / 2,
+                    minY: bullet.y - bullet.size / 2,
+                    maxX: bullet.x + bullet.size / 2,
+                    maxY: bullet.y + bullet.size / 2,
+                    bullet: bullet
+                }, (a, b) => a.bullet.id === b.bullet.id);
+
+                bulletIndex.insert({
+                    minX: bullet.x - bullet.size / 2,
+                    minY: bullet.y - bullet.size / 2,
+                    maxX: bullet.x + bullet.size / 2,
+                    maxY: bullet.y + bullet.size / 2,
+                    bullet: bullet
+                });
+                break;
+            }
 
             // Check collision with nearby tiles using rbush
             if (checkBulletMapCollision(bullet, gameMap)) {

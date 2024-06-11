@@ -71,7 +71,13 @@ const getRandomEmptyLocation = (yMin, yMax) => {
     const emptyLocations = [];
     for (let i = yMin; i < yMax; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
-            if (gameMap[i][j] === 0) {
+            if (gameMap[i][j] === 0 &&
+                j < gameMap[i].length - 1 &&
+                i < gameMap.length - 1 &&
+                gameMap[i][j + 1] === 0 &&
+                gameMap[i + 1][j] === 0 &&
+                gameMap[i + 1][j + 1] === 0
+            ) {
                 emptyLocations.push({ x: j * tileSize, y: i * tileSize });
             }
         }

@@ -241,6 +241,11 @@ function draw() {
         }
     }
 
+    drawHardpoints();
+
+    drawMines();
+
+
     // Draw bullets
     if (gameState && gameState.bullets) {
         for (let bulletId in gameState.bullets) {
@@ -249,7 +254,7 @@ function draw() {
         }
     }
 
-    // Draw the players that the server sent
+    // Draw players
     if (gameState && gameState.players && prevState) {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
@@ -263,7 +268,7 @@ function draw() {
             for (let j = 0; j < tiles[i].length; j++) {
                 if (tiles[i][j] === 1) {
                     push();
-                    fill("#c9b7b1"); // Example tile color
+                    fill("#c9b7b1");
                     strokeWeight(2);
                     rect(j * tileSize, i * tileSize, tileSize, tileSize);
                     pop();
@@ -272,8 +277,6 @@ function draw() {
         }
     }
 
-    // Draw mines and mine explosions
-    drawMines();
     drawMineExplosions();
 }
 
@@ -294,7 +297,7 @@ function drawBullet(bullet) {
 
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
-        return; // Exit the loop once the bullet is found
+        return;
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();

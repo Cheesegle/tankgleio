@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 
 const Player = require('./player');
-const Bullet = require('./bullet'); // Import the Bullet class
+const Bullet = require('./bullet');
 const Mine = require('./mine');
 const { updateMovement, updateBullets, initMap, updateMines } = require('./gameLogic');
 const { generateMap } = require('./mapGenerator');
@@ -19,6 +19,34 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 const tileSize = 50; // Size of each tile
 
+const generateHardPoint = () => {
+    const hardPoint = {
+        x: Math.floor(Math.random() * (gameMap[0].length - 5)), // Random x-coordinate
+        y: Math.floor(Math.random() * (gameMap.length - 5)), // Random y-coordinate
+        width: 5,
+        height: 5
+    };
+
+    // Check if the area around the hard point is mostly empty
+    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
+        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
+            if (gameMap[i][j] !== 0) {
+                // Not empty, regenerate hard point
+                return generateHardPoint();
+            }
+        }
+    }
+
+    // Mark the area as a hard point
+    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
+        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
+            gameMap[i][j] = 2; // Assuming 2 represents hard points
+        }
+    }
+
+    return hardPoint;
+};
+
 const gameMap = generateMap(50, 50, 10, 0.5);
 
 initMap(gameMap, tileSize);
@@ -26,7 +54,8 @@ initMap(gameMap, tileSize);
 const gameState = {
     players: {},
     bullets: {},
-    mines: {}
+    mines: {},
+    hardPoint: generateHardPoint()
 };
 
 function truncateString(str, num) {
@@ -90,7 +119,6 @@ io.on('connection', (socket) => {
         let lastShotTime = lastShotTimes[socket.id] || 0;
         let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds
 
-        // Check if enough time has passed since the last shot
         if (currentTime - lastShotTime >= shootCooldown) {
             io.emit('shot');
             let bullet = new Bullet(
@@ -107,10 +135,8 @@ io.on('connection', (socket) => {
             );
             gameState.bullets[bullet.id] = bullet;
 
-            // Update the last shot time for the player
             lastShotTimes[socket.id] = currentTime;
         } else {
-            // Handle case where the player is still on cooldown
             socket.emit('blipSound');
         }
     });
@@ -120,17 +146,14 @@ io.on('connection', (socket) => {
         if (!player) return;
         let currentTime = performance.now();
         let lastMineTime = lastMineTimes[socket.id] || 0;
-        let mineCooldown = player.mineCooldown; // Adjust cooldown time in milliseconds
+        let mineCooldown = player.mineCooldown;
 
-        // Check if enough time has passed since the last shot
         if (currentTime - lastMineTime >= mineCooldown) {
             io.emit('minedownSound');
             let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
             gameState.mines[mine.id] = mine;
-            // Update the last shot time for the player
             lastMineTimes[socket.id] = currentTime;
         } else {
-            // Handle case where the player is still on cooldown
             socket.emit('blipSound');
         }
     });

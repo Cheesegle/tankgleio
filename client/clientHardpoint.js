@@ -9,6 +9,7 @@ function drawHardpoints() {
 function drawHardPoint(hardPoint) {
     push();
     stroke('rgba(235, 168, 52, 0.5)');
+    strokeWeight(2);
     fill('rgba(255, 214, 99, 0.5)');
     rect(hardPoint.x * tileSize, hardPoint.y * tileSize, hardPoint.width * tileSize, hardPoint.height * tileSize);
     pop();

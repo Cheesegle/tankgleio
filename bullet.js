@@ -13,8 +13,6 @@ class Bullet {
         this.damage = damage;
         this.bounces = bounces;
         this.team = team;
-        
-        this.blownup = false;
     }
 
     move() {

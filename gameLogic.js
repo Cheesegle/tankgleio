@@ -194,7 +194,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 if (checkBulletPlayerCollision(bullet, player)) {
                     bulletsToRemove.push(bulletId);
                     collided = true;
-                    break; 
+                    break;
                 }
             }
 
@@ -220,18 +220,11 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             for (const nearbyBullet of nearbyBullets) {
                 const otherBullet = nearbyBullet.bullet;
                 if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
-                    let subtractedDamages = bullet.damage - otherBullet.damage;
+                    
+                    bulletsToRemove.push(otherBullet.id);
+                    bulletsToRemove.push(bulletId);
 
-                    if (subtractedDamages === 0) {
-                        bulletsToRemove.push(otherBullet.id);
-                        bulletsToRemove.push(bulletId);
-                    } else {
-                        subtractedDamages > 0 ? 
-                            bulletsToRemove.push(otherBullet.id) : 
-                            bulletsToRemove.push(bulletId);
-                    }
-
-                    blowup = {x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2};
+                    blowup = { x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2 };
                     collided = true;
                     break;
                 }

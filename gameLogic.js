@@ -2,6 +2,7 @@ const SAT = require('sat');
 const rbush = require('rbush');
 
 const tileIndex = new rbush();
+const bulletIndex = new rbush();
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -145,6 +146,13 @@ const checkBulletMapCollision = (bullet, gameMap) => {
     return false; // No collision detected with nearby tiles
 };
 
+const checkBulletBulletCollision = (bullet1, bullet2) => {
+    const bullet1Circle = new SAT.Circle(new SAT.Vector(bullet1.x, bullet1.y), bullet1.size);
+    const bullet2Circle = new SAT.Circle(new SAT.Vector(bullet2.x, bullet2.y), bullet2.size);
+
+    return SAT.testCircleCircle(bullet1Circle, bullet2Circle);
+};
+
 // Function to check collision between a bullet and a tile
 const checkBulletTileCollision = (bullet, tile) => {
     const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
@@ -167,6 +175,7 @@ const checkBulletTileCollision = (bullet, tile) => {
 // Update bullets function using rbush for collision detection
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
+    let blowup = false;
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
@@ -185,7 +194,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 if (checkBulletPlayerCollision(bullet, player)) {
                     bulletsToRemove.push(bulletId);
                     collided = true;
-                    break; 
+                    break;
                 }
             }
 
@@ -201,6 +210,26 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 bullet.bounces -= 1;
             }
 
+            const nearbyBullets = bulletIndex.search({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2
+            });
+
+            for (const nearbyBullet of nearbyBullets) {
+                const otherBullet = nearbyBullet.bullet;
+                if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
+                    
+                    bulletsToRemove.push(otherBullet.id);
+                    bulletsToRemove.push(bulletId);
+
+                    blowup = { x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2 };
+                    collided = true;
+                    break;
+                }
+            }
+
             if (collided) break;
 
             if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
@@ -208,14 +237,45 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 bulletsToRemove.push(bulletId);
                 break;
             }
+
+            bulletIndex.remove({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2,
+                bullet: bullet
+            }, (a, b) => a.bullet.id === b.bullet.id);
+
+            bulletIndex.insert({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2,
+                bullet: bullet
+            });
         }
     }
 
     // Remove collided or out-of-bounds bullets
     for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
-        delete gameState.bullets[bulletsToRemove[i]];
+        const bulletId = bulletsToRemove[i];
+        const bullet = gameState.bullets[bulletId];
+        if (bullet) {
+            bulletIndex.remove({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2,
+                bullet: bullet
+            }, (a, b) => a.bullet.id === b.bullet.id);
+            delete gameState.bullets[bulletId];
+        }
     }
+
+    if (blowup) return blowup;
 };
+
+
 
 const updateMines = (gameState, io) => {
     for (const mineId in gameState.mines) {

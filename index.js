@@ -66,11 +66,14 @@ var lastMineTimes = {};
 
 io.on('connection', (socket) => {
     let team;
-    if(Math.random() < 0.5){
+    if (Math.random() < 0.5) {
         team = 'red';
     } else {
-        team = 'green';
+        team = 'blue';
     }
+
+    socket.emit('team', team);
+
     socket.on('newPlayer', (data) => {
         if (!data.username) return;
         socket.emit('mapUpdate', gameMap);
@@ -137,6 +140,15 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('switchTeam', () => {
+        if (team === 'blue') {
+            team = 'red';
+        } else {
+            team = 'blue';
+        }
+        socket.emit('team', team);
+    });
+
     socket.on('disconnect', () => {
         delete gameState.players[socket.id];
         delete movementQueue[socket.id];
@@ -146,7 +158,7 @@ io.on('connection', (socket) => {
 function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
-        
+
         if (player.health < player.maxHealth) {
             gameState.players[playerId].health += (player.regenRate / 3);
         }

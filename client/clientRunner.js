@@ -1,4 +1,4 @@
-let socket;
+let socket = io();
 let gameState = null;
 let prevState = null;
 let lastTick = null;
@@ -39,12 +39,26 @@ function preload() {
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
 
+function switchTeam() {
+    socket.emit('switchTeam');
+}
+
+
+socket.on('team', (team) => {
+    const switchTeamButton = document.getElementById('switchTeamButton');
+    if (team === 'red') {
+        switchTeamButton.style.setProperty('background-color', 'red', 'important');
+    } else if (team === 'blue') {
+        switchTeamButton.style.setProperty('background-color', 'blue', 'important');
+    } else {
+        switchTeamButton.style.setProperty('background-color', 'gray', 'important');
+    }
+});
+
+
 function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
-
-    // Initialize socket.io
-    socket = io();
 
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';

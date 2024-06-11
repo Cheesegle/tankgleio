@@ -181,7 +181,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
         let bullet = gameState.bullets[bulletId];
 
         //sub-stepping (whatever its called)
-        const steps = bullet.speed / 2;
+        const steps = Math.ceil(bullet.speed / 2);
         const stepSize = bullet.speed / steps;
         let collided = false;
 
@@ -233,13 +233,9 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                     }
 
                     blowup = { x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2 };
-                    collided = true;
                     break;
                 }
             }
-
-
-            if (collided) break;
 
             if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
                 bullet.y < 0 || bullet.y > gameMap.length * tileSize) {

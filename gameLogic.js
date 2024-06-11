@@ -65,8 +65,12 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
         }
 
         // Apply the movement
-        player.x += movementDirection.x;
-        player.y += movementDirection.y;
+        if (player.stun <= 0) {
+            player.x += movementDirection.x;
+            player.y += movementDirection.y;
+        } else {
+            player.stun--;
+        }
 
         if (playerMovement.mouseAngle) {
             player.turretAngle = playerMovement.mouseAngle;
@@ -272,6 +276,11 @@ const updateMines = (gameState, io) => {
     for (const mineId in gameState.mines) {
         const mine = gameState.mines[mineId];
         mine.timeleft--; // Decrement timeleft
+
+        if (mine.timeleft == 9) {
+            io.emit('explodeMineSound');
+        }
+
         if (mine.timeleft <= 0) {
             mine.explode(gameState, io); // Explode the mine if timeleft is zero or less
         }

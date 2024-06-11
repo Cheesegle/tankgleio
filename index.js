@@ -123,7 +123,14 @@ io.on('connection', (socket) => {
         let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds
 
         if (currentTime - lastShotTime >= shootCooldown) {
-            io.emit('shot');
+            if (player.tankType == 'big') {
+                socket.emit('bigShot');
+                player.stun = 4;
+            } else {
+                io.emit('shot');
+                player.stun = 2;
+            }
+
             let bullet = new Bullet(
                 player.x + player.width / 2,
                 player.y + player.height / 2,
@@ -139,8 +146,6 @@ io.on('connection', (socket) => {
             gameState.bullets[bullet.id] = bullet;
 
             lastShotTimes[socket.id] = currentTime;
-        } else {
-            socket.emit('blipSound');
         }
     });
 
@@ -156,8 +161,7 @@ io.on('connection', (socket) => {
             let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
             gameState.mines[mine.id] = mine;
             lastMineTimes[socket.id] = currentTime;
-        } else {
-            socket.emit('blipSound');
+            player.stun = 5;
         }
     });
 

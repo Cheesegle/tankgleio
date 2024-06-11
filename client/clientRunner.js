@@ -22,6 +22,9 @@ const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
 
+var trackCount = 0;
+const tracks = [];
+
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
     let SN = (1 - w) * Math.sin(A) + w * Math.sin(B);
@@ -196,6 +199,19 @@ function draw() {
     // Translate canvas to follow player with interpolated camera position
     translate(-playerCameraX, -playerCameraY);
 
+    for (var i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+
+        if (track.delete) {
+            tracks.splice(i, 1);
+            continue;
+        }
+
+        track.update();
+        track.render();
+    }
+    trackCount++;
+
     drawMines();
 
     //render tile shadow
@@ -226,6 +242,11 @@ function draw() {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
             drawPlayer(player, playerId);
+
+            if (trackCount >= 5) {
+                trackCount = 0;
+                tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+            }
         }
     }
 

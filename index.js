@@ -18,6 +18,7 @@ const tickRate = 1000 / 20;
 app.use(express.static(path.join(__dirname, 'client')));
 
 const tileSize = 50; // Size of each tile
+let gameMap = generateMap(50, 50, 10, 0.5);
 
 const generateHardPoint = () => {
     const hardPoint = {
@@ -46,8 +47,6 @@ const generateHardPoint = () => {
 
     return hardPoint;
 };
-
-const gameMap = generateMap(50, 50, 10, 0.5);
 
 initMap(gameMap, tileSize);
 
@@ -98,11 +97,7 @@ io.on('connection', (socket) => {
         if (!data || !data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
-        if (team === 'red') {
-            spawnLocation = getRandomEmptyLocation(0, 10);
-        } else {
-            spawnLocation = getRandomEmptyLocation(gameMap.length - 10, gameMap.length)
-        }
+            spawnLocation = getRandomEmptyLocation(0, gameMap.length);
         let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;
     });

@@ -8,7 +8,7 @@ class Mine {
         this.explodeRadius = 200;
         this.size = 20;
         this.owner = owner;
-        this.damage = 100;
+        this.damage = 300;
         this.timeleft = 5 * 20; // Timeleft is in ticks (20 ticks per second)
     }
 

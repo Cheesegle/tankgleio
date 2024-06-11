@@ -280,8 +280,8 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 
     // Remove collided or out-of-bounds bullets
     for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
-        const bulletId = bulletsToRemove[i];
-        const bullet = gameState.bullets[bulletId];
+        let bulletId = bulletsToRemove[i];
+        let bullet = gameState.bullets[bulletId];
         if (bullet) {
             bulletIndex.remove({
                 minX: bullet.x - bullet.size / 2,
@@ -296,7 +296,6 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 
     if (blowup) return blowup;
 };
-
 
 
 const updateMines = (gameState, io) => {

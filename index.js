@@ -67,9 +67,9 @@ var lastMineTimes = {};
 io.on('connection', (socket) => {
     let team;
     if(Math.random() < 0.5){
-        team = 'alpha';
+        team = 'red';
     } else {
-        team = 'bravo';
+        team = 'green';
     }
     socket.on('newPlayer', (data) => {
         if (!data.username) return;

@@ -95,7 +95,7 @@ const checkBulletPlayerCollision = (bullet, player) => {
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
 
-    if (collided && bullet.owner !== player.id) {
+    if (collided && bullet.owner !== player.id && bullet.team !== player.team) {
         player.health -= bullet.damage;
         return true;
     }

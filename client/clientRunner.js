@@ -304,7 +304,8 @@ function drawPlayer(player, playerId) {
             player.color,
             player.turretColor,
             player.width,
-            player.height
+            player.height,
+            player.team
         );
         tank.render();
 

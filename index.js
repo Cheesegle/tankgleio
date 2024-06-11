@@ -102,9 +102,6 @@ io.on('connection', (socket) => {
 
                 // Update the last shot time for the player
                 lastShotTimes[socket.id] = currentTime;
-            } else {
-                // Handle case where the player is still on cooldown
-                socket.emit('blipSound');
             }
         }
     });
@@ -123,9 +120,6 @@ io.on('connection', (socket) => {
                 gameState.mines[mine.id] = mine;
                 // Update the last shot time for the player
                 lastMineTimes[socket.id] = currentTime;
-            } else {
-                // Handle case where the player is still on cooldown
-                socket.emit('blipSound');
             }
         }
     });

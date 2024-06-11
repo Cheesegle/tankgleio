@@ -30,11 +30,10 @@ function rLerp(A, B, w) {
 
 function preload() {
     // Load sound files
-    shootSound = loadSound('shoot.wav');
+    shootSound = loadSound('shellShot.mp3');
     explodeSound = loadSound('explosion.wav');
-    minedownSound = loadSound('minedown.wav');
-    explodeMineSound = loadSound('explodemine.wav');
-    blipSound = loadSound('blip.wav');
+    minedownSound = loadSound('mineDown.mp3');
+    explodeMineSound = loadSound('mineExplode.mp3');
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
@@ -58,10 +57,6 @@ function setup() {
 
     socket.on('explodeSound', (state) => {
         explodeSound.play();
-    });
-
-    socket.on('blipSound', (state) => {
-        blipSound.play();
     });
 
     socket.on('minedownSound', (state) => {
@@ -127,6 +122,10 @@ function drawMines() {
 function drawMine(mine) {
     push();
     noStroke();
+
+    fill(SHADOW);
+    ellipse(mine.x + 4, mine.y + 4, mine.size);
+
     fill('#FFD700');
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
@@ -192,6 +191,8 @@ function draw() {
     // Translate canvas to follow player with interpolated camera position
     translate(-playerCameraX, -playerCameraY);
 
+    drawMines();
+
     //render tile shadow
     if (gameState && tiles) {
         for (let i = 0; i < tiles.length; i++) {
@@ -238,8 +239,6 @@ function draw() {
         }
     }
 
-    // Draw mines and mine explosions
-    drawMines();
     drawMineExplosions();
 }
 

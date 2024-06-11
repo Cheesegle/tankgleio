@@ -86,7 +86,13 @@ io.on('connection', (socket) => {
 
             // Check if enough time has passed since the last shot
             if (currentTime - lastShotTime >= shootCooldown) {
-                io.emit('shot');
+                if (player.tankType == 'big') {
+                    io.emit('bigShot');
+                    player.stun = 4;
+                } else {
+                    io.emit('shot');
+                    player.stun = 2;
+                }
                 let bullet = new Bullet(
                     player.x + player.width / 2,
                     player.y + player.height / 2,
@@ -120,6 +126,7 @@ io.on('connection', (socket) => {
                 gameState.mines[mine.id] = mine;
                 // Update the last shot time for the player
                 lastMineTimes[socket.id] = currentTime;
+                player.stun = 5;
             }
         }
     });

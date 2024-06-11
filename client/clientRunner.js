@@ -30,6 +30,7 @@ function rLerp(A, B, w) {
 
 function preload() {
     // Load sound files
+    bigShootSound = loadSound('bigShellShot.mp3');
     shootSound = loadSound('shellShot.mp3');
     explodeSound = loadSound('explosion.wav');
     minedownSound = loadSound('mineDown.mp3');
@@ -53,6 +54,10 @@ function setup() {
 
     socket.on('shot', (state) => {
         shootSound.play();
+    });
+
+    socket.on('bigShot', (state) => {
+        bigShootSound.play();
     });
 
     socket.on('explodeSound', (state) => {

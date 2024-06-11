@@ -64,8 +64,12 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
         }
 
         // Apply the movement
-        player.x += movementDirection.x;
-        player.y += movementDirection.y;
+        if (player.stun == 0) {
+            player.x += movementDirection.x;
+            player.y += movementDirection.y;
+        } else {
+            player.stun--;
+        }
 
         if (playerMovement.mouseAngle) {
             player.turretAngle = playerMovement.mouseAngle;
@@ -227,7 +231,7 @@ const updateMines = (gameState, io) => {
         }
 
         if (mine.timeleft <= 0) {
-            mine.explode(gameState, io); // Explode the mine if timeleft is zero or less
+            mine.explode(gameState); // Explode the mine if timeleft is zero or less
         }
     }
 };

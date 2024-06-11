@@ -283,11 +283,8 @@ function drawBullet(bullet) {
         fill(SHADOW);
         ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
 
-        if (bullet.owner === socket.id) {
-            fill('green');
-        } else {
-            fill('white');
-        }
+        fill(bullet.team);
+
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
         return; // Exit the loop once the bullet is found

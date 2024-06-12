@@ -293,6 +293,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
             for (let nearbyBullet of nearbyBullets) {
                 let otherBullet = nearbyBullet.bullet;
+                if(gameState.bullets[bullet.id].deleted || gameState.bullets[otherBullet.id].deleted) break;
                 if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet) && gameState.bullets[otherBullet.id]) {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 

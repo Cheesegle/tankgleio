@@ -104,7 +104,7 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
     if (collided && bullet.owner !== player.id && bullet.team !== player.team) {
         player.health -= bullet.damage;
         if (player.health <= 0) {
-            gameState.players[bullet.owner].score += 100;
+            gameState.players[bullet.owner].score += 10;
         }
         return true;
     }

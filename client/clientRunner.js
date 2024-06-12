@@ -47,6 +47,12 @@ function preload() {
 
 function soundLoaded() {
     new p5.Reverb().process(explodeMineSound, 1, 1);
+    explodeMineSound.setVolume(0.3);
+    bigShootSound.setVolume(0.3);
+    shootSound.setVolume(0.3);
+    explodeSound.setVolume(0.3);
+    bulletBulletSound.setVolume(0.3);
+    minedownSound.setVolume(0.3);
     //...
 }
 
@@ -118,7 +124,6 @@ function setup() {
             gameState = state;
         }
     });
-
 }
 
 function startGame() {

@@ -201,6 +201,8 @@ function draw() {
     // Clear the canvas
     clear();
 
+    textFont(customFont);
+
     push();
     updateZoom();
 

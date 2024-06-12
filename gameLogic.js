@@ -230,6 +230,14 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
         for (let step = 0; step < steps; step++) {
 
+            // Remove collided or out-of-bounds bullets
+            if (bullet.deleted) {
+                let bullet = gameState.bullets[bulletId];
+                if (bullet) {
+                    delete gameState.bullets[bulletId];
+                }
+            }
+
             if (bullet.deleted === true) break;
 
             bullet.x += bullet.vx * stepSize;
@@ -324,14 +332,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
                 gameState.bullets[bulletId].deleted = true;
                 break;
-            }
-
-            // Remove collided or out-of-bounds bullets
-            if (bullet.deleted) {
-                let bullet = gameState.bullets[bulletId];
-                if (bullet) {
-                    delete gameState.bullets[bulletId];
-                }
             }
         }
     }

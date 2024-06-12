@@ -188,7 +188,6 @@ const checkBulletMineCollision = (bullet, mine) => {
     const collided = SAT.testCircleCircle(bulletCircle, mineCircle);
 
     if (collided) {
-        mine.timeleft = 0; // Trigger the mine explosion
         return true;
     }
 
@@ -197,7 +196,6 @@ const checkBulletMineCollision = (bullet, mine) => {
 
 // Update bullets function using rbush for collision detection
 const updateBullets = (gameState, gameMap, tileSize, io) => {
-    const bulletsToRemove = [];
     bulletIndex = new rbush();
     playerIndex = new rbush();
 
@@ -248,7 +246,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 let player = nearbyPlayer.player;
                 if (!player.dead) {
                     if (checkBulletPlayerCollision(bullet, player, gameState)) {
-                        bulletsToRemove.push(bulletId);
                         bullet.deleted = true;
                         break;
                     }
@@ -258,7 +255,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
             // Check collision with nearby tiles using rbush
             if (checkBulletMapCollision(bullet, gameMap)) {
                 if (bullet.bounces <= 0) {
-                    bulletsToRemove.push(bulletId);
                     bullet.deleted = true;
                     break;
                 }
@@ -314,7 +310,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
             for (let nearbyMine of nearbyMines) {
                 let mine = nearbyMine.mine;
                 if (checkBulletMineCollision(bullet, mine)) {
-                    bulletsToRemove.push(bulletId);
+                    mine.timeleft = 0;
                     bullet.deleted = true; // Set collided flag
                     break;
                 }
@@ -322,7 +318,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
             if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
                 bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
-                bulletsToRemove.push(bulletId);
+                gameState.bullets[bulletId].deleted = true;
                 break;
             }
         }

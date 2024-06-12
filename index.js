@@ -212,7 +212,7 @@ function updatePlayers() {
 
             // Other player updates
             if (player.health < player.maxHealth) {
-                gameState.players[playerId].health += (player.regenRate / 3);
+                gameState.players[playerId].health += (player.regenRate / 6);
             }
             if (player.health <= 0) {
                 player.dead = true;

@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
         if (!gameState.players[socket.id]) {
             let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
             gameState.players[socket.id] = newPlayer;
-        } else if (gameState.players[socket.id].dead === true){
+        } else if (gameState.players[socket.id].dead === true) {
             let player = gameState.players[socket.id];
             gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score)
         } else {
@@ -190,35 +190,34 @@ io.on('connection', (socket) => {
 function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
+        if (!player.dead) {
+            // Check if the player is on a hard point
+            if (isPlayerOnHardPoint(player)) {
 
-        if (player.dead) return;
+                //add score to player
+                player.score += tickRate / 1000;
 
-        // Check if the player is on a hard point
-        if (isPlayerOnHardPoint(player)) {
+                // Add score to the player's team
+                if (player.team === 'red') {
+                    // Increment red team score
+                    gameState.redTeamScore += tickRate / 1000;
+                } else {
+                    // Increment blue team score
+                    gameState.blueTeamScore += tickRate / 1000;
+                }
 
-            //add score to player
-            player.score += tickRate / 1000;
 
-            // Add score to the player's team
-            if (player.team === 'red') {
-                // Increment red team score
-                gameState.redTeamScore += tickRate / 1000;
-            } else {
-                // Increment blue team score
-                gameState.blueTeamScore += tickRate / 1000;
             }
 
-
-        }
-
-        // Other player updates
-        if (player.health < player.maxHealth) {
-            gameState.players[playerId].health += (player.regenRate / 3);
-        }
-        if (player.health <= 0) {
-            player.dead = true;
-            io.to(player.id).emit('dead');
-            io.emit('explodeSound');
+            // Other player updates
+            if (player.health < player.maxHealth) {
+                gameState.players[playerId].health += (player.regenRate / 3);
+            }
+            if (player.health <= 0) {
+                player.dead = true;
+                io.to(player.id).emit('dead');
+                io.emit('explodeSound');
+            }
         }
     }
 }

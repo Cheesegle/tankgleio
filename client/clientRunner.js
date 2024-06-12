@@ -23,6 +23,7 @@ const maxScalingFactor = 3000;
 const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
+let damageNumbers = [];
 
 let playerTracks = {};
 
@@ -281,6 +282,11 @@ function draw() {
     if (gameState && gameState.bullets) {
         for (let bulletId in gameState.bullets) {
             let bullet = gameState.bullets[bulletId];
+            if (prevState && prevState.bullets[bulletId]) {
+                if (bullet.damage < prevState.bullets[bulletId].damage) {
+                    createDamageNumber(bullet.x, bullet.y, prevState.bullets[bulletId].damage - bullet.damage);
+                }
+            }
             drawBullet(bullet);
         }
     }
@@ -289,8 +295,12 @@ function draw() {
     if (gameState && gameState.players && prevState) {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
-            if (!player.dead) {
+            if (!player.dead && prevState.players[playerId]) {
                 drawPlayer(player, playerId);
+
+                if (player.health < prevState.players[playerId].health) {
+                    createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
+                }
 
                 // Store player tracks
                 if (!playerTracks[playerId]) {
@@ -330,6 +340,16 @@ function draw() {
         }
     }
 
+    // Update and render damage numbers
+    for (let i = damageNumbers.length - 1; i >= 0; i--) {
+        const number = damageNumbers[i];
+        number.update();
+        number.render();
+        if (number.timer <= 0) {
+            damageNumbers.splice(i, 1); // Remove the damage number when its timer expires
+        }
+    }
+
     drawMineExplosions();
     pop();
     // Draw scoreboard
@@ -338,6 +358,11 @@ function draw() {
 
 function drawHUD() {
     drawScoresAndTeamStats();
+}
+
+// Function to create damage numbers
+function createDamageNumber(x, y, value) {
+    damageNumbers.push(new DamageNumber(x, y, value));
 }
 
 function drawScoresAndTeamStats() {

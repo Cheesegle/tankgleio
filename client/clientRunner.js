@@ -138,7 +138,7 @@ function startGame() {
     document.getElementById('startMenu').style.display = 'none';
 
     // Join the game with the username
-    socket.emit('newPlayer', {
+    socket.emit('spawn', {
         username: username,
         tankType: tankType
     });
@@ -278,11 +278,13 @@ function draw() {
     if (gameState && gameState.players && prevState) {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
-            drawPlayer(player, playerId);
+            if (!player.dead) {
+                drawPlayer(player, playerId);
 
-            if (trackCount >= 5) {
-                trackCount = 0;
-                tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+                if (trackCount >= 5) {
+                    trackCount = 0;
+                    tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+                }
             }
         }
     }
@@ -317,13 +319,13 @@ function drawScoresAndTeamStats() {
     const sectionWidth = 220;
     const sectionHeight = 40;
     const spacing = 10;
-    
+
     let y = padding;
     const x = width - sectionWidth - padding;
 
     drawTeamScore('Red Team', 'rgba(231, 76, 60, 0.8)', gameState.redTeamScore, x, y, sectionWidth, sectionHeight);
     y += sectionHeight + spacing;
-    
+
     y = drawTeamSection('Red Team', 'rgba(231, 76, 60, 0.8)', gameState.players, 'red', x, y, sectionWidth);
     y += padding;
 

@@ -257,10 +257,12 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 
             for (const nearbyPlayer of nearbyPlayers) {
                 let player = nearbyPlayer.player;
-                if (checkBulletPlayerCollision(bullet, player, gameState)) {
-                    bulletsToRemove.push(bulletId);
-                    bullet.deleted = true;
-                    break;
+                if (!player.dead) {
+                    if (checkBulletPlayerCollision(bullet, player, gameState)) {
+                        bulletsToRemove.push(bulletId);
+                        bullet.deleted = true;
+                        break;
+                    }
                 }
             }
 

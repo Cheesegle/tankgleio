@@ -101,14 +101,18 @@ io.on('connection', (socket) => {
 
     socket.emit('team', team);
 
-    socket.on('newPlayer', (data) => {
-        if (gameState.players[socket.id]) return;
+    socket.on('spawn', (data) => {
         if (!data || !data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
         spawnLocation = getRandomEmptyLocation(0, gameMap.length);
-        let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
-        gameState.players[socket.id] = newPlayer;
+        if (gameState.players[socket.id]) {
+            let player = gameState.players[socket.id];
+            gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score)
+        } else {
+            let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
+            gameState.players[socket.id] = newPlayer;
+        }
     });
 
     socket.on('playerMovement', (playerMovement) => {
@@ -185,6 +189,8 @@ function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
 
+        if (player.dead) return;
+
         // Check if the player is on a hard point
         if (isPlayerOnHardPoint(player)) {
 
@@ -208,8 +214,7 @@ function updatePlayers() {
             gameState.players[playerId].health += (player.regenRate / 3);
         }
         if (player.health <= 0) {
-            delete gameState.players[playerId];
-            delete movementQueue[playerId];
+            player.dead = true;
             io.to(player.id).emit('dead');
             io.emit('explodeSound');
         }

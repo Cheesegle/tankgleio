@@ -1,5 +1,5 @@
 class Player {
-    constructor(x, y, angle, turretAngle, id, username, tankType = 'normal', team) {
+    constructor(x, y, angle, turretAngle, id, username, tankType = 'normal', team, score = 0) {
         this.x = x || 0;
         this.y = y || 0;
         this.angle = angle || 0;
@@ -11,7 +11,8 @@ class Player {
         this.tankType = tankType;
         this.team = team;
         this.stun = 0;
-        this.score = 0;
+        this.score = score;
+        this.dead = false;
 
         // Set properties based on the tank type
         switch (tankType) {

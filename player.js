@@ -10,6 +10,7 @@ class Player {
         this.bullets = [];
         this.tankType = tankType;
         this.team = team;
+        this.stun = 0;
 
         // Set properties based on the tank type
         switch (tankType) {

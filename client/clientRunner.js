@@ -24,6 +24,9 @@ const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
 
+var trackCount = 0;
+const tracks = [];
+
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
     let SN = (1 - w) * Math.sin(A) + w * Math.sin(B);
@@ -32,12 +35,12 @@ function rLerp(A, B, w) {
 
 function preload() {
     // Load sound files
-    shootSound = loadSound('shoot.wav', soundLoaded);
+    bigShootSound = loadSound('bigShellShot.mp3', soundLoaded);
+    shootSound = loadSound('shellShot.mp3', soundLoaded);
     explodeSound = loadSound('explosion.wav', soundLoaded);
     bulletBulletSound = loadSound('explosion.wav', soundLoaded);
-    minedownSound = loadSound('minedown.wav', soundLoaded);
-    explodeMineSound = loadSound('explodemine.wav', soundLoaded);
-    blipSound = loadSound('blip.wav', soundLoaded);
+    minedownSound = loadSound('mineDown.mp3', soundLoaded);
+    explodeMineSound = loadSound('mineExplode.mp3', soundLoaded);
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
@@ -78,12 +81,12 @@ function setup() {
         shootSound.play();
     });
 
-    socket.on('explodeSound', (state) => {
-        explodeSound.play();
+    socket.on('bigShot', (state) => {
+        bigShootSound.play();
     });
 
-    socket.on('blipSound', (state) => {
-        blipSound.play();
+    socket.on('explodeSound', (state) => {
+        explodeSound.play();
     });
 
     socket.on('minedownSound', (state) => {
@@ -159,6 +162,10 @@ function drawMines() {
 function drawMine(mine) {
     push();
     noStroke();
+
+    fill(SHADOW);
+    ellipse(mine.x + 4, mine.y + 4, mine.size);
+
     fill('#FFD700');
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
@@ -242,6 +249,19 @@ function draw() {
 
     drawHardpoints();
 
+    for (var i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+
+        if (track.delete) {
+            tracks.splice(i, 1);
+            continue;
+        }
+
+        track.update();
+        track.render();
+    }
+    trackCount++;
+
     drawMines();
 
     // Draw bullets
@@ -257,6 +277,11 @@ function draw() {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
             drawPlayer(player, playerId);
+
+            if (trackCount >= 5) {
+                trackCount = 0;
+                tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+            }
         }
     }
 

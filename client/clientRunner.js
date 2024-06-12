@@ -300,7 +300,7 @@ function draw() {
 
                 console.log(threshold)
 
-                if (playerTracks[playerId].count > threshold) {
+                if (playerTracks[playerId].count >= threshold) {
                     if (prevState && prevState.players[playerId]) {
                         let prevPlayer = prevState.players[playerId];
                         if (prevPlayer.x !== player.x || prevPlayer.y !== player.y) {

@@ -168,7 +168,11 @@ function drawMine(mine) {
     fill(SHADOW);
     ellipse(mine.x + 4, mine.y + 4, mine.size);
 
-    fill('#FFD700');
+    if (mine.timeleft <= 9) {
+        fill('#ff4000');
+    } else {
+        fill('#FFD700');
+    }
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
 }

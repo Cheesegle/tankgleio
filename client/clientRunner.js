@@ -363,7 +363,7 @@ function drawTeamSection(teamName, color, players, team, x, y, width) {
         rect(x, y, width, 30, 10);
         fill(255);
         text(`${player.username.slice(0,10)}`, x + 10, y + 5);
-        text(`${player.score} pts`, x + 155, y + 5);
+        text(`${Math.round(player.score)} pts`, x + 155, y + 5);
         y += 40;
     }
 

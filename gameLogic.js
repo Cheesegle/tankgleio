@@ -4,6 +4,7 @@ const rbush = require('rbush');
 var tileIndex = new rbush();
 var bulletIndex = new rbush();
 var playerIndex = new rbush();
+var mineIndex = new rbush();
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -176,6 +177,21 @@ const checkBulletTileCollision = (bullet, tile) => {
     return collided;
 };
 
+// Function to check collision between a bullet and a mine
+const checkBulletMineCollision = (bullet, mine) => {
+    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
+    const mineCircle = new SAT.Circle(new SAT.Vector(mine.x, mine.y), mine.size / 2);
+
+    const collided = SAT.testCircleCircle(bulletCircle, mineCircle);
+
+    if (collided) {
+        mine.timeleft = 0; // Trigger the mine explosion
+        return true;
+    }
+
+    return false;
+};
+
 // Update bullets function using rbush for collision detection
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
@@ -191,6 +207,17 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             maxX: player.x + player.hitboxWidth,
             maxY: player.y + player.hitboxHeight,
             player: player
+        });
+    }
+
+    for (const mineId in gameState.mines) {
+        const mine = gameState.mines[mineId];
+        mineIndex.insert({
+            minX: mine.x - mine.size / 2,
+            minY: mine.y - mine.size / 2,
+            maxX: mine.x + mine.size / 2,
+            maxY: mine.y + mine.size / 2,
+            mine: mine
         });
     }
 
@@ -225,7 +252,7 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             });
 
             for (const nearbyPlayer of nearbyPlayers) {
-                const player = nearbyPlayer.player;
+                let player = nearbyPlayer.player;
                 if (checkBulletPlayerCollision(bullet, player)) {
                     bulletsToRemove.push(bulletId);
                     collided = true;
@@ -250,8 +277,8 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 maxY: bullet.y + bullet.size / 2
             });
 
-            for (const nearbyBullet of nearbyBullets) {
-                const otherBullet = nearbyBullet.bullet;
+            for (let nearbyBullet of nearbyBullets) {
+                let otherBullet = nearbyBullet.bullet;
                 if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 
@@ -266,6 +293,23 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                     }
 
                     blowup = { x: (bullet.x + otherBullet.x) / 2, y: (bullet.y + otherBullet.y) / 2 };
+                    break;
+                }
+            }
+
+
+            const nearbyMines = mineIndex.search({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2
+            });
+
+            for (let nearbyMine of nearbyMines) {
+                let mine = nearbyMine.mine;
+                if (checkBulletMineCollision(bullet, mine)) {
+                    bulletsToRemove.push(bulletId);
+                    collided = true;
                     break;
                 }
             }

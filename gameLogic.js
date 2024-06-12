@@ -1,8 +1,10 @@
 const SAT = require('sat');
 const rbush = require('rbush');
 
-const tileIndex = new rbush();
-const bulletIndex = new rbush();
+var tileIndex = new rbush();
+var bulletIndex = new rbush();
+var playerIndex = new rbush();
+var mineIndex = new rbush();
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -14,9 +16,9 @@ const rLerp = (A, B, w) => {
     return Math.atan2(SN, CS);
 };
 
-const checkCollision = (player, tile, tileSize) => {
+const checkPlayerTileCollision = (player, tile, tileSize) => {
     let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
-    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tileSize, tileSize).toPolygon();
+    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tile.width, tile.height).toPolygon();
 
     let response = new SAT.Response();
     let collided = SAT.testPolygonPolygon(playerRect, tileRect, response);
@@ -65,24 +67,27 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
         }
 
         // Apply the movement
-        player.x += movementDirection.x;
-        player.y += movementDirection.y;
+        if (player.stun <= 0) {
+            player.x += movementDirection.x;
+            player.y += movementDirection.y;
+        } else {
+            player.stun--;
+        }
 
         if (playerMovement.mouseAngle) {
             player.turretAngle = playerMovement.mouseAngle;
         }
 
-        // Check collision with tiles
-        for (let i = 0; i < gameMap.length; i++) {
-            for (let j = 0; j < gameMap[i].length; j++) {
-                if (gameMap[i][j] === 1) {
-                    let tile = {
-                        x: j * tileSize,
-                        y: i * tileSize
-                    };
-                    checkCollision(player, tile, tileSize);
-                }
-            }
+        const nearbyTiles = tileIndex.search({
+            minX: player.x,
+            minY: player.y,
+            maxX: player.x + player.hitboxWidth,
+            maxY: player.y + player.hitboxHeight
+        });
+
+        for (const tile of nearbyTiles) {
+            const tileRect = tile.tile;
+            checkPlayerTileCollision(player, tileRect);
         }
     }
     movementQueue = {}; // Clear the movement queue after processing
@@ -172,10 +177,60 @@ const checkBulletTileCollision = (bullet, tile) => {
     return collided;
 };
 
+// Function to check collision between a bullet and a mine
+const checkBulletMineCollision = (bullet, mine) => {
+    const bulletCircle = new SAT.Circle(new SAT.Vector(bullet.x, bullet.y), bullet.size / 2);
+    const mineCircle = new SAT.Circle(new SAT.Vector(mine.x, mine.y), mine.size / 2);
+
+    const collided = SAT.testCircleCircle(bulletCircle, mineCircle);
+
+    if (collided) {
+        mine.timeleft = 0; // Trigger the mine explosion
+        return true;
+    }
+
+    return false;
+};
+
 // Update bullets function using rbush for collision detection
 const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
     let blowup = false;
+    bulletIndex = new rbush();
+    playerIndex = new rbush();
+
+    for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+        playerIndex.insert({
+            minX: player.x,
+            minY: player.y,
+            maxX: player.x + player.hitboxWidth,
+            maxY: player.y + player.hitboxHeight,
+            player: player
+        });
+    }
+
+    for (const mineId in gameState.mines) {
+        const mine = gameState.mines[mineId];
+        mineIndex.insert({
+            minX: mine.x - mine.size / 2,
+            minY: mine.y - mine.size / 2,
+            maxX: mine.x + mine.size / 2,
+            maxY: mine.y + mine.size / 2,
+            mine: mine
+        });
+    }
+
+    for (const bulletId in gameState.bullets) {
+        let bullet = gameState.bullets[bulletId];
+        bulletIndex.insert({
+            minX: bullet.x - bullet.size / 2,
+            minY: bullet.y - bullet.size / 2,
+            maxX: bullet.x + bullet.size / 2,
+            maxY: bullet.y + bullet.size / 2,
+            bullet: bullet
+        });
+    }
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
@@ -189,16 +244,21 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             bullet.x += bullet.vx * stepSize;
             bullet.y += bullet.vy * stepSize;
 
-            for (const playerId in gameState.players) {
-                const player = gameState.players[playerId];
+            const nearbyPlayers = playerIndex.search({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2
+            });
+
+            for (const nearbyPlayer of nearbyPlayers) {
+                let player = nearbyPlayer.player;
                 if (checkBulletPlayerCollision(bullet, player)) {
                     bulletsToRemove.push(bulletId);
                     collided = true;
                     break;
                 }
             }
-
-            if (collided) break;
 
             // Check collision with nearby tiles using rbush
             if (checkBulletMapCollision(bullet, gameMap)) {
@@ -217,8 +277,8 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 maxY: bullet.y + bullet.size / 2
             });
 
-            for (const nearbyBullet of nearbyBullets) {
-                const otherBullet = nearbyBullet.bullet;
+            for (let nearbyBullet of nearbyBullets) {
+                let otherBullet = nearbyBullet.bullet;
                 if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 
@@ -237,42 +297,36 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                 }
             }
 
+
+            const nearbyMines = mineIndex.search({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2
+            });
+
+            for (let nearbyMine of nearbyMines) {
+                let mine = nearbyMine.mine;
+                if (checkBulletMineCollision(bullet, mine)) {
+                    bulletsToRemove.push(bulletId);
+                    collided = true;
+                    break;
+                }
+            }
+
             if (bullet.x < 0 || bullet.x > gameMap[0].length * tileSize ||
                 bullet.y < 0 || bullet.y > gameMap.length * tileSize) {
                 bulletsToRemove.push(bulletId);
                 break;
             }
-
-            bulletIndex.remove({
-                minX: bullet.x - bullet.size / 2,
-                minY: bullet.y - bullet.size / 2,
-                maxX: bullet.x + bullet.size / 2,
-                maxY: bullet.y + bullet.size / 2,
-                bullet: bullet
-            }, (a, b) => a.bullet.id === b.bullet.id);
-
-            bulletIndex.insert({
-                minX: bullet.x - bullet.size / 2,
-                minY: bullet.y - bullet.size / 2,
-                maxX: bullet.x + bullet.size / 2,
-                maxY: bullet.y + bullet.size / 2,
-                bullet: bullet
-            });
         }
     }
 
     // Remove collided or out-of-bounds bullets
     for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
-        const bulletId = bulletsToRemove[i];
-        const bullet = gameState.bullets[bulletId];
+        let bulletId = bulletsToRemove[i];
+        let bullet = gameState.bullets[bulletId];
         if (bullet) {
-            bulletIndex.remove({
-                minX: bullet.x - bullet.size / 2,
-                minY: bullet.y - bullet.size / 2,
-                maxX: bullet.x + bullet.size / 2,
-                maxY: bullet.y + bullet.size / 2,
-                bullet: bullet
-            }, (a, b) => a.bullet.id === b.bullet.id);
             delete gameState.bullets[bulletId];
         }
     }
@@ -281,11 +335,15 @@ const updateBullets = (gameState, gameMap, tileSize) => {
 };
 
 
-
 const updateMines = (gameState, io) => {
     for (const mineId in gameState.mines) {
         const mine = gameState.mines[mineId];
         mine.timeleft--; // Decrement timeleft
+
+        if (mine.timeleft == 9) {
+            io.emit('explodeMineSound');
+        }
+
         if (mine.timeleft <= 0) {
             mine.explode(gameState, io); // Explode the mine if timeleft is zero or less
         }

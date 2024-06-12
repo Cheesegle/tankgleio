@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 
 const Player = require('./player');
-const Bullet = require('./bullet'); // Import the Bullet class
+const Bullet = require('./bullet');
 const Mine = require('./mine');
 const { updateMovement, updateBullets, initMap, updateMines } = require('./gameLogic');
 const { generateMap } = require('./mapGenerator');
@@ -18,15 +18,45 @@ const tickRate = 1000 / 20;
 app.use(express.static(path.join(__dirname, 'client')));
 
 const tileSize = 50; // Size of each tile
+let gameMap = generateMap(50, 50, 10, 0.5);
 
-const gameMap = generateMap(50, 50, 10, 0.5);
+const generateHardPoint = () => {
+    const hardPoint = {
+        x: Math.floor(Math.random() * (gameMap[0].length - 5)), // Random x-coordinate
+        y: Math.floor(Math.random() * (gameMap.length - 5)), // Random y-coordinate
+        width: 5,
+        height: 5
+    };
+
+    // Check if the area around the hard point is mostly empty
+    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
+        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
+            if (gameMap[i][j] !== 0) {
+                // Not empty, regenerate hard point
+                return generateHardPoint();
+            }
+        }
+    }
+
+    // Mark the area as a hard point
+    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
+        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
+            gameMap[i][j] = 2; // Assuming 2 represents hard points
+        }
+    }
+
+    return hardPoint;
+};
 
 initMap(gameMap, tileSize);
 
 const gameState = {
     players: {},
     bullets: {},
-    mines: {}
+    mines: {},
+    hardPoint: generateHardPoint(),
+    redTeamScore: 0,
+    blueTeamScore: 0
 };
 
 function truncateString(str, num) {
@@ -41,24 +71,19 @@ const getRandomEmptyLocation = (yMin, yMax) => {
     const emptyLocations = [];
     for (let i = yMin; i < yMax; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
-            if (gameMap[i][j] === 0) {
+            if (gameMap[i][j] === 0 &&
+                j < gameMap[i].length - 1 &&
+                i < gameMap.length - 1 &&
+                gameMap[i][j + 1] === 0 &&
+                gameMap[i + 1][j] === 0 &&
+                gameMap[i + 1][j + 1] === 0
+            ) {
                 emptyLocations.push({ x: j * tileSize, y: i * tileSize });
             }
         }
     }
     return emptyLocations[Math.floor(Math.random() * emptyLocations.length)];
 };
-
-const redSpawnLocations = [];
-const blueSpawnLocations = [];
-
-for (let i = 0; i < 5; i++) {
-    redSpawnLocations.push(getRandomEmptyLocation(0, 10));
-}
-
-for (let i = 0; i < 5; i++) {
-    blueSpawnLocations.push(getRandomEmptyLocation(gameMap.length - 10, gameMap.length));
-}
 
 var movementQueue = {};
 
@@ -80,11 +105,7 @@ io.on('connection', (socket) => {
         if (!data || !data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
-        if (team === 'red') {
-            spawnLocation = redSpawnLocations[Math.floor(Math.random() * redSpawnLocations.length)];
-        } else {
-            spawnLocation = blueSpawnLocations[Math.floor(Math.random() * blueSpawnLocations.length)];
-        }
+        spawnLocation = getRandomEmptyLocation(0, gameMap.length);
         let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
         gameState.players[socket.id] = newPlayer;
     });
@@ -101,9 +122,15 @@ io.on('connection', (socket) => {
         let lastShotTime = lastShotTimes[socket.id] || 0;
         let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds
 
-        // Check if enough time has passed since the last shot
         if (currentTime - lastShotTime >= shootCooldown) {
-            io.emit('shot');
+            if (player.tankType == 'big') {
+                socket.emit('bigShot');
+                player.stun = 4;
+            } else {
+                io.emit('shot');
+                player.stun = 2;
+            }
+
             let bullet = new Bullet(
                 player.x + player.width / 2,
                 player.y + player.height / 2,
@@ -118,11 +145,7 @@ io.on('connection', (socket) => {
             );
             gameState.bullets[bullet.id] = bullet;
 
-            // Update the last shot time for the player
             lastShotTimes[socket.id] = currentTime;
-        } else {
-            // Handle case where the player is still on cooldown
-            socket.emit('blipSound');
         }
     });
 
@@ -131,18 +154,14 @@ io.on('connection', (socket) => {
         if (!player) return;
         let currentTime = performance.now();
         let lastMineTime = lastMineTimes[socket.id] || 0;
-        let mineCooldown = player.mineCooldown; // Adjust cooldown time in milliseconds
+        let mineCooldown = player.mineCooldown;
 
-        // Check if enough time has passed since the last shot
         if (currentTime - lastMineTime >= mineCooldown) {
             io.emit('minedownSound');
             let mine = new Mine(player.x + player.width / 2, player.y + player.height / 2, player.id);
             gameState.mines[mine.id] = mine;
-            // Update the last shot time for the player
             lastMineTimes[socket.id] = currentTime;
-        } else {
-            // Handle case where the player is still on cooldown
-            socket.emit('blipSound');
+            player.stun = 5;
         }
     });
 
@@ -165,6 +184,19 @@ function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
 
+        // Check if the player is on a hard point
+        if (isPlayerOnHardPoint(player)) {
+            // Add score to the player's team
+            if (player.team === 'red') {
+                // Increment red team score
+                gameState.redTeamScore += tickRate / 1000;
+            } else {
+                // Increment blue team score
+                gameState.blueTeamScore += tickRate / 1000;
+            }
+        }
+
+        // Other player updates
         if (player.health < player.maxHealth) {
             gameState.players[playerId].health += (player.regenRate / 3);
         }
@@ -175,6 +207,13 @@ function updatePlayers() {
             io.emit('explodeSound');
         }
     }
+}
+
+function isPlayerOnHardPoint(player) {
+    // Assuming hard points are represented by value 2 in the game map
+    const tileX = Math.floor((player.x + player.width / 2) / tileSize);
+    const tileY = Math.floor((player.y + player.height / 2) / tileSize);
+    return gameMap[tileY][tileX] === 2;
 }
 
 setInterval(() => {

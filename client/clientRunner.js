@@ -9,6 +9,8 @@ let playerCameraX = 0;
 let playerCameraY = 0;
 let lerpedPlayerX = 0;
 let lerpedPlayerY = 0;
+let playerWidth = 0;
+let playerHeight = 0;
 const cameraLerpAmount = 0.07;
 let gameStarted = false;
 let username = '';
@@ -22,6 +24,9 @@ const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
 
+var trackCount = 0;
+const tracks = [];
+
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
     let SN = (1 - w) * Math.sin(A) + w * Math.sin(B);
@@ -30,17 +35,17 @@ function rLerp(A, B, w) {
 
 function preload() {
     // Load sound files
-    shootSound = loadSound('shoot.wav', soundLoaded);
+    bigShootSound = loadSound('bigShellShot.mp3', soundLoaded);
+    shootSound = loadSound('shellShot.mp3', soundLoaded);
     explodeSound = loadSound('explosion.wav', soundLoaded);
     bulletBulletSound = loadSound('explosion.wav', soundLoaded);
-    minedownSound = loadSound('minedown.wav', soundLoaded);
-    explodeMineSound = loadSound('explodemine.wav', soundLoaded);
-    blipSound = loadSound('blip.wav', soundLoaded);
+    minedownSound = loadSound('mineDown.mp3', soundLoaded);
+    explodeMineSound = loadSound('mineExplode.mp3', soundLoaded);
     // Load custom font
     customFont = loadFont('Poppins-Bold.ttf'); // Update this path to your font file
 }
 
-function soundLoaded(){
+function soundLoaded() {
     new p5.Reverb().process(explodeMineSound, 1, 1);
     //...
 }
@@ -76,12 +81,12 @@ function setup() {
         shootSound.play();
     });
 
-    socket.on('explodeSound', (state) => {
-        explodeSound.play();
+    socket.on('bigShot', (state) => {
+        bigShootSound.play();
     });
 
-    socket.on('blipSound', (state) => {
-        blipSound.play();
+    socket.on('explodeSound', (state) => {
+        explodeSound.play();
     });
 
     socket.on('minedownSound', (state) => {
@@ -109,9 +114,9 @@ function setup() {
             gameState = state;
         }
     });
-    
+
     socket.on('explodeBullet', (pos) => {
-        if(typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)){
+        if (typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)) {
             //todo effects maybe
             bulletBulletSound.play();
         }
@@ -137,7 +142,10 @@ function startGame() {
         username: username,
         tankType: tankType
     });
-    gameStarted = true;
+    setTimeout(() => {
+        gameStarted = true;
+    }, 10);
+
 }
 
 // Add a function to draw mines
@@ -154,6 +162,10 @@ function drawMines() {
 function drawMine(mine) {
     push();
     noStroke();
+
+    fill(SHADOW);
+    ellipse(mine.x + 4, mine.y + 4, mine.size);
+
     fill('#FFD700');
     ellipse(mine.x, mine.y, mine.size, mine.size);
     pop();
@@ -182,15 +194,14 @@ function drawExplosionEffect(x, y, radius) {
     pop();
 }
 
-// Update the draw() function to call these new functions
 function draw() {
-    if (!gameStarted) {
-        return; // Skip drawing if the game hasn't started
-    }
+    if (!gameStarted) return;
+    if (!gameState) return;
 
     // Clear the canvas
     clear();
 
+    push();
     updateZoom();
 
     // Apply scaling
@@ -209,6 +220,8 @@ function draw() {
         if (gameState.players[socket.id] && prevState.players[socket.id]) {
             lerpedPlayerX = lerp(prevState.players[socket.id].x, gameState.players[socket.id].x, lastTickDiff);
             lerpedPlayerY = lerp(prevState.players[socket.id].y, gameState.players[socket.id].y, lastTickDiff);
+            playerWidth = gameState.players[socket.id].width;
+            playerHeight = gameState.players[socket.id].height;
         }
     }
 
@@ -234,6 +247,23 @@ function draw() {
         }
     }
 
+    drawHardpoints();
+
+    for (var i = 0; i < tracks.length; i++) {
+        const track = tracks[i];
+
+        if (track.delete) {
+            tracks.splice(i, 1);
+            continue;
+        }
+
+        track.update();
+        track.render();
+    }
+    trackCount++;
+
+    drawMines();
+
     // Draw bullets
     if (gameState && gameState.bullets) {
         for (let bulletId in gameState.bullets) {
@@ -242,11 +272,16 @@ function draw() {
         }
     }
 
-    // Draw the players that the server sent
+    // Draw players
     if (gameState && gameState.players && prevState) {
         for (let playerId in gameState.players) {
             let player = gameState.players[playerId];
             drawPlayer(player, playerId);
+
+            if (trackCount >= 5) {
+                trackCount = 0;
+                tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+            }
         }
     }
 
@@ -256,7 +291,7 @@ function draw() {
             for (let j = 0; j < tiles[i].length; j++) {
                 if (tiles[i][j] === 1) {
                     push();
-                    fill("#c9b7b1"); // Example tile color
+                    fill("#c9b7b1");
                     strokeWeight(2);
                     rect(j * tileSize, i * tileSize, tileSize, tileSize);
                     pop();
@@ -265,9 +300,20 @@ function draw() {
         }
     }
 
-    // Draw mines and mine explosions
-    drawMines();
     drawMineExplosions();
+    pop();
+    // Draw scoreboard
+    drawScoreboard();
+}
+
+function drawScoreboard() {
+    push();
+    textAlign(RIGHT, TOP);
+    textSize(20);
+    fill(255);
+    text(`Red Team: ${Math.round(gameState.redTeamScore) || 0}`, width - 20, 20);
+    text(`Blue Team: ${Math.round(gameState.blueTeamScore) || 0}`, width - 20, 50);
+    pop();
 }
 
 
@@ -283,14 +329,11 @@ function drawBullet(bullet) {
         fill(SHADOW);
         ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
 
-        if (bullet.owner === socket.id) {
-            fill('green');
-        } else {
-            fill('white');
-        }
+        fill(bullet.team);
+
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
-        return; // Exit the loop once the bullet is found
+        return;
     }
     // If no previous state or matching bullet found, draw bullet without interpolation
     push();
@@ -299,11 +342,8 @@ function drawBullet(bullet) {
     fill(SHADOW);
     ellipse(bullet.x + 2, bullet.y + 2, bullet.size);
 
-    if (bullet.owner === socket.id) {
-        fill('green');
-    } else {
-        fill('white');
-    }
+    fill(bullet.team);
+
     ellipse(bullet.x, bullet.y, bullet.size);
     pop();
 }

@@ -125,6 +125,7 @@ io.on('connection', (socket) => {
     socket.on('shoot', () => {
         let player = gameState.players[socket.id];
         if (!player) return;
+        if(player.dead) return;
         let currentTime = performance.now();
         let lastShotTime = lastShotTimes[socket.id] || 0;
         let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds

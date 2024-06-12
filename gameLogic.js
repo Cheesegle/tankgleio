@@ -225,17 +225,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
-        bulletIndex.insert({
-            minX: bullet.x - bullet.size / 2,
-            minY: bullet.y - bullet.size / 2,
-            maxX: bullet.x + bullet.size / 2,
-            maxY: bullet.y + bullet.size / 2,
-            bullet: bullet
-        });
-    }
-
-    for (const bulletId in gameState.bullets) {
-        let bullet = gameState.bullets[bulletId];
 
         //sub-stepping (whatever its called)
         const steps = Math.ceil(bullet.speed / 2);
@@ -274,6 +263,17 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                     break;
                 }
                 bullet.bounces -= 1;
+            }
+
+            for (const bulletId in gameState.bullets) {
+                let bullet = gameState.bullets[bulletId];
+                bulletIndex.insert({
+                    minX: bullet.x - bullet.size / 2,
+                    minY: bullet.y - bullet.size / 2,
+                    maxX: bullet.x + bullet.size / 2,
+                    maxY: bullet.y + bullet.size / 2,
+                    bullet: bullet
+                });
             }
 
             const nearbyBullets = bulletIndex.search({

@@ -305,17 +305,71 @@ function draw() {
     drawMineExplosions();
     pop();
     // Draw scoreboard
-    drawScoreboard();
+    drawHUD();
 }
 
-function drawScoreboard() {
+function drawHUD() {
+    drawScoresAndTeamStats();
+}
+
+function drawScoresAndTeamStats() {
+    const padding = 20;
+    const sectionWidth = 220;
+    const sectionHeight = 40;
+    const spacing = 10;
+    
+    let y = padding;
+    const x = width - sectionWidth - padding;
+
+    drawTeamScore('Red Team', 'rgba(231, 76, 60, 0.8)', gameState.redTeamScore, x, y, sectionWidth, sectionHeight);
+    y += sectionHeight + spacing;
+    
+    y = drawTeamSection('Red Team', 'rgba(231, 76, 60, 0.8)', gameState.players, 'red', x, y, sectionWidth);
+    y += padding;
+
+    drawTeamScore('Blue Team', 'rgba(52, 152, 219, 0.8)', gameState.blueTeamScore, x, y, sectionWidth, sectionHeight);
+    y += sectionHeight + spacing;
+
+    drawTeamSection('Blue Team', 'rgba(52, 152, 219, 0.8)', gameState.players, 'blue', x, y, sectionWidth);
+}
+
+function drawTeamScore(teamName, color, score, x, y, width, height) {
     push();
-    textAlign(RIGHT, TOP);
+    textAlign(LEFT, CENTER);
     textSize(20);
+    textFont('Helvetica');
+    fill(color);
+    rect(x, y, width, height, 10);
     fill(255);
-    text(`Red Team: ${Math.round(gameState.redTeamScore) || 0}`, width - 20, 20);
-    text(`Blue Team: ${Math.round(gameState.blueTeamScore) || 0}`, width - 20, 50);
+    text(`${teamName}: ${Math.round(score) || 0}`, x + 10, y + height / 2);
     pop();
+}
+
+function drawTeamSection(teamName, color, players, team, x, y, width) {
+    const playerList = Object.values(players).filter(player => player.team === team);
+    playerList.sort((a, b) => b.health - a.health);
+
+    const maxPlayersToShow = 10;
+    const playersToShow = playerList.slice(0, maxPlayersToShow);
+
+    push();
+    textAlign(LEFT, TOP);
+    textSize(16);
+    textFont('Helvetica');
+    fill(255);
+
+    for (const player of playersToShow) {
+        fill('rgba(0, 0, 0, 0.6)');
+        rect(x, y, width, 30, 10);
+        fill(255);
+        text(`${player.username.slice(0,10)}`, x + 10, y + 5);
+        text(`${player.score} pts`, x + 155, y + 5);
+        y += 40;
+    }
+
+    pop();
+
+    return y;
 }
 
 

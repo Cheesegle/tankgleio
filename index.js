@@ -159,7 +159,7 @@ io.on('connection', (socket) => {
 
     socket.on('layMine', () => {
         let player = gameState.players[socket.id];
-        if (!player) return;
+        if (!player || player.dead) return;
         let currentTime = performance.now();
         let lastMineTime = lastMineTimes[socket.id] || 0;
         let mineCooldown = player.mineCooldown;

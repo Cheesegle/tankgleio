@@ -77,24 +77,28 @@ function setup() {
     // Event listener for start button
     document.getElementById('startButton').addEventListener('click', startGame);
 
-    socket.on('shot', (state) => {
+    socket.on('shot', () => {
         shootSound.play();
     });
 
-    socket.on('bigShot', (state) => {
+    socket.on('bigShot', () => {
         bigShootSound.play();
     });
 
-    socket.on('explodeSound', (state) => {
+    socket.on('explodeSound', () => {
         explodeSound.play();
     });
 
-    socket.on('minedownSound', (state) => {
+    socket.on('minedownSound', () => {
         minedownSound.play();
     });
 
-    socket.on('explodeMineSound', (state) => {
+    socket.on('explodeMineSound', () => {
         explodeMineSound.play();
+    });
+
+    socket.on('explodeBulletSound', () => {
+        bulletBulletSound.play();
     });
 
     socket.on('mapUpdate', (serverTiles) => {
@@ -115,12 +119,6 @@ function setup() {
         }
     });
 
-    socket.on('explodeBullet', (pos) => {
-        if (typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)) {
-            //todo effects maybe
-            bulletBulletSound.play();
-        }
-    })
 }
 
 function startGame() {

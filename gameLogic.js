@@ -196,7 +196,7 @@ const checkBulletMineCollision = (bullet, mine) => {
 };
 
 // Update bullets function using rbush for collision detection
-const updateBullets = (gameState, gameMap, tileSize) => {
+const updateBullets = (gameState, gameMap, tileSize, io) => {
     const bulletsToRemove = [];
     bulletIndex = new rbush();
     playerIndex = new rbush();
@@ -289,16 +289,17 @@ const updateBullets = (gameState, gameMap, tileSize) => {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 
                     if (subtractedDamages > 0) {
-                        bulletsToRemove.push(otherBullet.id);
+                        gameState.bullets[otherBullet.id].deleted = true;
                         bullet.damage = subtractedDamages;
                     } else if (subtractedDamages < 0) {
-                        bulletsToRemove.push(bullet.id);
+                        bullet.deleted = true; // Set collided flag
                     } else {
-                        bulletsToRemove.push(otherBullet.id);
-                        bulletsToRemove.push(bullet.id);
+                        gameState.bullets[otherBullet.id].deleted = true;
+                        bullet.deleted = true;
                     }
 
-                    bullet.deleted = true; // Set collided flag
+                    io.emit('explodeBulletSound');
+
                     break;
                 }
             }

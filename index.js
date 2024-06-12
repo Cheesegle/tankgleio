@@ -232,7 +232,7 @@ function isPlayerOnHardPoint(player) {
 
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
-    updateBullets(gameState, gameMap, tileSize);
+    updateBullets(gameState, gameMap, tileSize, io);
     updateMines(gameState, io);
     updatePlayers();
     io.sockets.emit('state', gameState);

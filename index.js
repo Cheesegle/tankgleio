@@ -207,7 +207,6 @@ function updatePlayers() {
                     gameState.blueTeamScore += tickRate / 1000;
                 }
 
-
             }
 
             // Other player updates

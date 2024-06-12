@@ -311,8 +311,8 @@ function drawScoreboard() {
     textAlign(RIGHT, TOP);
     textSize(20);
     fill(255);
-    text(`Red Team: ${gameState.redTeamScore || 0}`, width - 20, 20);
-    text(`Blue Team: ${gameState.blueTeamScore || 0}`, width - 20, 50);
+    text(`Red Team: ${Math.round(gameState.redTeamScore) || 0}`, width - 20, 20);
+    text(`Blue Team: ${Math.round(gameState.blueTeamScore) || 0}`, width - 20, 50);
     pop();
 }
 

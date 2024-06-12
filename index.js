@@ -189,10 +189,10 @@ function updatePlayers() {
             // Add score to the player's team
             if (player.team === 'red') {
                 // Increment red team score
-                gameState.redTeamScore++;
+                gameState.redTeamScore += tickRate / 1000;
             } else {
                 // Increment blue team score
-                gameState.blueTeamScore++;
+                gameState.blueTeamScore += tickRate / 1000;
             }
         }
 

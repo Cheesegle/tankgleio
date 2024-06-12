@@ -15,9 +15,9 @@ const rLerp = (A, B, w) => {
     return Math.atan2(SN, CS);
 };
 
-const checkCollision = (player, tile, tileSize) => {
+const checkCollision = (player, tile) => {
     let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
-    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tileSize, tileSize).toPolygon();
+    let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tile.width, tile.height).toPolygon();
 
     let response = new SAT.Response();
     let collided = SAT.testPolygonPolygon(playerRect, tileRect, response);
@@ -73,17 +73,16 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
             player.turretAngle = playerMovement.mouseAngle;
         }
 
-        // Check collision with tiles
-        for (let i = 0; i < gameMap.length; i++) {
-            for (let j = 0; j < gameMap[i].length; j++) {
-                if (gameMap[i][j] === 1) {
-                    let tile = {
-                        x: j * tileSize,
-                        y: i * tileSize
-                    };
-                    checkCollision(player, tile, tileSize);
-                }
-            }
+        const nearbyTiles = tileIndex.search({
+            minX: player.x,
+            minY: player.y,
+            maxX: player.x + player.hitboxWidth,
+            maxY: player.y + player.hitboxHeight
+        });
+
+        for (const tile of nearbyTiles) {
+            const tileRect = tile.tile;
+            checkCollision(player, tileRect);
         }
     }
     movementQueue = {}; // Clear the movement queue after processing

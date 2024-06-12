@@ -106,12 +106,14 @@ io.on('connection', (socket) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
         spawnLocation = getRandomEmptyLocation(0, gameMap.length);
-        if (gameState.players[socket.id]) {
+        if (!gameState.players[socket.id]) {
+            let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
+            gameState.players[socket.id] = newPlayer;
+        } else if (gameState.players[socket.id].dead === true){
             let player = gameState.players[socket.id];
             gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score)
         } else {
-            let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
-            gameState.players[socket.id] = newPlayer;
+            //not supposed to happen!!!
         }
     });
 

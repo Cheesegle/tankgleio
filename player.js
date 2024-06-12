@@ -54,14 +54,14 @@ class Player {
                 this.hitboxWidth = 38;
                 this.hitboxHeight = 38;
                 this.moveSpeed = 9;
-                this.maxHealth = 80;
+                this.maxHealth = 90; // Reduced health
                 this.mineCooldown = 5000;
-                this.shootCooldown = 1500;
-                this.bulletSpeed = 30; // Reduced bullet speed
+                this.shootCooldown = 1200; // Reduced shoot cooldown
+                this.bulletSpeed = 35; // Increased bullet speed
                 this.bulletSize = 10;
-                this.bulletDamage = 120; // Reduced damage
-                this.regenRate = 2; // Slightly higher regeneration rate
-                this.bulletBounces = 2;
+                this.bulletDamage = 120;
+                this.regenRate = 2;
+                this.bulletBounces = 1; // Reduced bullet bounces
                 this.color = '#ED4245';
                 break;
             case 'speedy':

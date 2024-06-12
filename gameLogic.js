@@ -309,10 +309,12 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
             for (let nearbyMine of nearbyMines) {
                 let mine = nearbyMine.mine;
                 if (checkBulletMineCollision(bullet, mine)) {
-                    mine.timeleft = 10;
-                    bulletsToDelete.add(bullet.id);
-                    bullet.deleted = true;
-                    break;
+                    if (mine.timeleft > 10) {
+                        mine.timeleft = 10;
+                        bulletsToDelete.add(bullet.id);
+                        bullet.deleted = true;
+                        break;
+                    }
                 }
             }
 

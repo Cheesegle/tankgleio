@@ -3,6 +3,7 @@ const rbush = require('rbush');
 
 var tileIndex = new rbush();
 var bulletIndex = new rbush();
+var playerIndex = new rbush();
 
 const lerp = (start, end, amount) => {
     return (1 - amount) * start + amount * end;
@@ -177,6 +178,18 @@ const updateBullets = (gameState, gameMap, tileSize) => {
     const bulletsToRemove = [];
     let blowup = false;
     bulletIndex = new rbush();
+    playerIndex = new rbush();
+
+    for (const playerId in gameState.players) {
+        const player = gameState.players[playerId];
+        playerIndex.insert({
+            minX: player.x,
+            minY: player.y,
+            maxX: player.x + player.hitboxWidth,
+            maxY: player.y + player.hitboxHeight,
+            player: player
+        });
+    }
 
     for (const bulletId in gameState.bullets) {
         let bullet = gameState.bullets[bulletId];
@@ -201,8 +214,15 @@ const updateBullets = (gameState, gameMap, tileSize) => {
             bullet.x += bullet.vx * stepSize;
             bullet.y += bullet.vy * stepSize;
 
-            for (const playerId in gameState.players) {
-                const player = gameState.players[playerId];
+            const nearbyPlayers = playerIndex.search({
+                minX: bullet.x - bullet.size / 2,
+                minY: bullet.y - bullet.size / 2,
+                maxX: bullet.x + bullet.size / 2,
+                maxY: bullet.y + bullet.size / 2
+            });
+
+            for (const nearbyPlayer of nearbyPlayers) {
+                const player = nearbyPlayer.player;
                 if (checkBulletPlayerCollision(bullet, player)) {
                     bulletsToRemove.push(bulletId);
                     collided = true;

@@ -24,8 +24,8 @@ const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
 
+let playerTracks = {};
 var trackCount = 0;
-const tracks = [];
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -254,18 +254,21 @@ function draw() {
 
     drawHardpoints();
 
-    for (var i = 0; i < tracks.length; i++) {
-        const track = tracks[i];
+    // Update and render tracks
+    for (let playerId in playerTracks) {
+        let tracks = playerTracks[playerId];
+        for (let i = tracks.length - 1; i >= 0; i--) {
+            const track = tracks[i];
 
-        if (track.delete) {
-            tracks.splice(i, 1);
-            continue;
+            if (track.delete) {
+                tracks.splice(i, 1);
+                continue;
+            }
+
+            track.update();
+            track.render();
         }
-
-        track.update();
-        track.render();
     }
-    trackCount++;
 
     drawMines();
 
@@ -284,9 +287,16 @@ function draw() {
             if (!player.dead) {
                 drawPlayer(player, playerId);
 
-                if (trackCount >= 5) {
-                    trackCount = 0;
-                    tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+                // Store player tracks
+                if (!playerTracks[playerId]) {
+                    playerTracks[playerId] = [];
+                }
+                
+                if (prevState && prevState.players[playerId]) {
+                    let prevPlayer = prevState.players[playerId];
+                    if (prevPlayer.x !== player.x || prevPlayer.y !== player.y) {
+                        playerTracks[playerId].push(new Track(player.x, player.y, player.width, player.height, player.angle));
+                    }
                 }
             }
         }

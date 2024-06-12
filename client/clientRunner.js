@@ -51,7 +51,7 @@ function soundLoaded() {
     bigShootSound.setVolume(0.3);
     shootSound.setVolume(0.3);
     explodeSound.setVolume(0.3);
-    bulletBulletSound.setVolume(0.3);
+    bulletBulletSound.setVolume(0.65);
     minedownSound.setVolume(0.3);
     //...
 }

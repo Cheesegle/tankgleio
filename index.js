@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
 
         if (currentTime - lastShotTime >= shootCooldown) {
             if (player.tankType == 'big') {
-                socket.emit('bigShot');
+                io.emit('bigShot');
                 player.stun = 4;
             } else {
                 io.emit('shot');

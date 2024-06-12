@@ -118,7 +118,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playerMovement', (playerMovement) => {
-        if (!playerMovement) return;
+        if (!playerMovement || gameState.players[socket.id].dead) return;
         movementQueue[socket.id] = playerMovement;
     });
 

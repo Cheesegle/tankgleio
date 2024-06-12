@@ -102,6 +102,7 @@ io.on('connection', (socket) => {
     socket.emit('team', team);
 
     socket.on('newPlayer', (data) => {
+        if (gameState.players[socket.id]) return;
         if (!data || !data.username) return;
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;

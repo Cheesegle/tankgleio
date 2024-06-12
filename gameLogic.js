@@ -292,8 +292,8 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                         gameState.bullets[otherBullet.id].deleted = true;
                         bullet.damage = subtractedDamages;
                     } else if (subtractedDamages < 0) {
-                        bullet.deleted = true; // Set collided flag
-                    } else {
+                        bullet.deleted = true;
+                    } else if (subtractedDamages === 0) {
                         gameState.bullets[otherBullet.id].deleted = true;
                         bullet.deleted = true;
                     }

@@ -38,7 +38,7 @@ function preload() {
     bigShootSound = loadSound('bigShellShot.mp3', soundLoaded);
     shootSound = loadSound('shellShot.mp3', soundLoaded);
     explodeSound = loadSound('explosion.wav', soundLoaded);
-    bulletBulletSound = loadSound('explosion.wav', soundLoaded);
+    bulletBulletSound = loadSound('bulletExplosion.wav', soundLoaded);
     minedownSound = loadSound('mineDown.mp3', soundLoaded);
     explodeMineSound = loadSound('mineExplode.mp3', soundLoaded);
     // Load custom font
@@ -47,6 +47,12 @@ function preload() {
 
 function soundLoaded() {
     new p5.Reverb().process(explodeMineSound, 1, 1);
+    explodeMineSound.setVolume(0.3);
+    bigShootSound.setVolume(0.3);
+    shootSound.setVolume(0.3);
+    explodeSound.setVolume(0.3);
+    bulletBulletSound.setVolume(0.3);
+    minedownSound.setVolume(0.3);
     //...
 }
 
@@ -116,10 +122,7 @@ function setup() {
     });
 
     socket.on('explodeBullet', (pos) => {
-        if (typeof pos === 'object' && !isNaN(pos.x) && !isNaN(pos.y)) {
-            //todo effects maybe
-            bulletBulletSound.play();
-        }
+        bulletBulletSound.play();
     })
 }
 

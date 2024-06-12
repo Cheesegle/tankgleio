@@ -310,6 +310,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 let mine = nearbyMine.mine;
                 if (checkBulletMineCollision(bullet, mine)) {
                     mine.timeleft = 0;
+                    io.emit('explodeMineSound');
                     bulletsToDelete.add(bullet.id);
                     bullet.deleted = true;
                     break;

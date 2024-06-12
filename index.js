@@ -186,6 +186,10 @@ function updatePlayers() {
 
         // Check if the player is on a hard point
         if (isPlayerOnHardPoint(player)) {
+
+            //add score to player
+            player.score += tickRate / 1000;
+
             // Add score to the player's team
             if (player.team === 'red') {
                 // Increment red team score
@@ -194,6 +198,8 @@ function updatePlayers() {
                 // Increment blue team score
                 gameState.blueTeamScore += tickRate / 1000;
             }
+
+
         }
 
         // Other player updates
@@ -218,10 +224,7 @@ function isPlayerOnHardPoint(player) {
 
 setInterval(() => {
     updateMovement(gameState, movementQueue, gameMap, tileSize);
-    let blownup = updateBullets(gameState, gameMap, tileSize);
-    if (blownup) {
-        io.emit("explodeBullet", blownup);
-    }
+    updateBullets(gameState, gameMap, tileSize);
     updateMines(gameState, io);
     updatePlayers();
     io.sockets.emit('state', gameState);

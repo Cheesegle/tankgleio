@@ -105,7 +105,6 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
         player.health -= bullet.damage;
         if (player.health <= 0) {
             gameState.players[bullet.owner].score += 100;
-            console.log(gameState.players[bullet.owner].score)
         }
         return true;
     }

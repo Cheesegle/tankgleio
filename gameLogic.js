@@ -274,12 +274,14 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 }
             }
 
-            const nearbyBullets = bulletIndex.search({
+            let nearbyBullets = bulletIndex.search({
                 minX: bullet.x - bullet.size / 2,
                 minY: bullet.y - bullet.size / 2,
                 maxX: bullet.x + bullet.size / 2,
                 maxY: bullet.y + bullet.size / 2
             });
+
+            nearbyBullets = nearbyBullets.filter(b => b.id !== bullet.id);
 
             for (let nearbyBullet of nearbyBullets) {
                 let otherBullet = nearbyBullet.bullet;

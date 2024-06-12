@@ -326,7 +326,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 break;
             }
         }
-
         // Remove collided or out-of-bounds bullets
         if (bullet.deleted) {
             let bullet = gameState.bullets[bulletId];

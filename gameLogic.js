@@ -15,7 +15,7 @@ const rLerp = (A, B, w) => {
     return Math.atan2(SN, CS);
 };
 
-const checkCollision = (player, tile) => {
+const checkPlayerTileCollision = (player, tile, tileSize) => {
     let playerRect = new SAT.Box(new SAT.Vector(player.x, player.y), player.hitboxWidth, player.hitboxHeight).toPolygon();
     let tileRect = new SAT.Box(new SAT.Vector(tile.x, tile.y), tile.width, tile.height).toPolygon();
 
@@ -86,7 +86,7 @@ const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
 
         for (const tile of nearbyTiles) {
             const tileRect = tile.tile;
-            checkCollision(player, tileRect);
+            checkPlayerTileCollision(player, tileRect);
         }
     }
     movementQueue = {}; // Clear the movement queue after processing

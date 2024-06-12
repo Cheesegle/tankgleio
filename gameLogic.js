@@ -263,13 +263,15 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
             for (const bulletId in gameState.bullets) {
                 let bullet = gameState.bullets[bulletId];
-                bulletIndex.insert({
-                    minX: bullet.x - bullet.size / 2,
-                    minY: bullet.y - bullet.size / 2,
-                    maxX: bullet.x + bullet.size / 2,
-                    maxY: bullet.y + bullet.size / 2,
-                    bullet: bullet
-                });
+                if (!bullet.deleted) {
+                    bulletIndex.insert({
+                        minX: bullet.x - bullet.size / 2,
+                        minY: bullet.y - bullet.size / 2,
+                        maxX: bullet.x + bullet.size / 2,
+                        maxY: bullet.y + bullet.size / 2,
+                        bullet: bullet
+                    });
+                }
             }
 
             const nearbyBullets = bulletIndex.search({
@@ -281,7 +283,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
 
             for (let nearbyBullet of nearbyBullets) {
                 let otherBullet = nearbyBullet.bullet;
-                if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet)) {
+                if (otherBullet.id !== bullet.id && checkBulletBulletCollision(bullet, otherBullet) && gameState.bullets[otherBullet.id]) {
                     let subtractedDamages = bullet.damage - otherBullet.damage;
 
                     if (subtractedDamages > 0) {
@@ -321,12 +323,13 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
                 gameState.bullets[bulletId].deleted = true;
                 break;
             }
-        }
-        // Remove collided or out-of-bounds bullets
-        if (bullet.deleted) {
-            let bullet = gameState.bullets[bulletId];
-            if (bullet) {
-                delete gameState.bullets[bulletId];
+
+            // Remove collided or out-of-bounds bullets
+            if (bullet.deleted) {
+                let bullet = gameState.bullets[bulletId];
+                if (bullet) {
+                    delete gameState.bullets[bulletId];
+                }
             }
         }
     }

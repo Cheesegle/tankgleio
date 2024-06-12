@@ -38,7 +38,7 @@ function preload() {
     bigShootSound = loadSound('bigShellShot.mp3', soundLoaded);
     shootSound = loadSound('shellShot.mp3', soundLoaded);
     explodeSound = loadSound('explosion.wav', soundLoaded);
-    bulletBulletSound = loadSound('explosion.wav', soundLoaded);
+    bulletBulletSound = loadSound('bulletExplosion.wav', soundLoaded);
     minedownSound = loadSound('mineDown.mp3', soundLoaded);
     explodeMineSound = loadSound('mineExplode.mp3', soundLoaded);
     // Load custom font

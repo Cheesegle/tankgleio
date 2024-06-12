@@ -298,8 +298,6 @@ function draw() {
 
                 let threshold = Math.ceil(4 / player.moveSpeed * deltaTime);
 
-                console.log(threshold)
-
                 if (playerTracks[playerId].count >= threshold) {
                     if (prevState && prevState.players[playerId]) {
                         let prevPlayer = prevState.players[playerId];

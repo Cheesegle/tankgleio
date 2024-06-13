@@ -1,7 +1,7 @@
 const SAT = require('sat');
 const rbush = require('rbush');
 
-const tileIndex = new rbush();
+let tileIndex = new rbush();
 let bulletIndex = new rbush();
 let playerIndex = new rbush();
 let mineIndex = new rbush();

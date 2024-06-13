@@ -28,6 +28,10 @@ let playerTracks = {};
 let ping = 0;
 let pingStart = performance.now();
 
+let currentFPS = 0;
+let frameCount = 0;
+let lastUpdate = performance.now();
+
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
     let SN = (1 - w) * Math.sin(A) + w * Math.sin(B);
@@ -367,11 +371,19 @@ function draw() {
     // Draw scoreboard
     drawHUD();
 
+    frameCount++;
+
+    if (performance.now() - lastUpdate >= 1000) {
+        currentFPS = frameCount;
+        frameCount = 0;
+        lastUpdate = performance.now();
+    }
+
     push();
     fill(255);
     textSize(20);
     text(`Ping: ${ping} ms`, 20, 30);
-    text(`FPS: ${frameRate().toFixed(1)}`, 20, 60);
+    text(`FPS: ${currentFPS}`, 20, 60);
     pop();
 }
 

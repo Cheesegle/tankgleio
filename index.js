@@ -248,12 +248,16 @@ function isPlayerOnHardPoint(player) {
     // Assuming hard points are represented by value 2 in the game map
     const tileX = Math.floor((player.x + player.width / 2) / tileSize);
     const tileY = Math.floor((player.y + player.height / 2) / tileSize);
-    return gameMap[tileY][tileX] === 2;
+    if (gameMap[tileY][tileX]) {
+        return gameMap[tileY][tileX] === 2;
+    } else {
+        return false;
+    }
 }
 
 setInterval(() => {
     gameState.roundTimeLeft--;
-    if(gameState.roundTimeLeft <= 0){
+    if (gameState.roundTimeLeft <= 0) {
         newRound();
     }
     updateMovement(gameState, movementQueue, gameMap, tileSize);

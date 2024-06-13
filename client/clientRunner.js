@@ -389,6 +389,16 @@ function draw() {
 
 function drawHUD() {
     drawScoresAndTeamStats();
+    // Display round time left
+    push();
+    textAlign(CENTER, TOP); // Center text horizontally, align to the top
+    textSize(20);
+    fill(255);
+    const minutes = Math.floor((gameState.roundTimeLeft / 20) / 60);
+    const seconds = Math.floor((gameState.roundTimeLeft / 20) % 60);
+    const timeLeftString = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    text(`Time Left: ${timeLeftString}`, width / 2, 20);
+    pop();
 }
 
 // Function to create damage numbers
@@ -421,7 +431,6 @@ function drawTeamScore(teamName, color, score, x, y, width, height) {
     push();
     textAlign(LEFT, CENTER);
     textSize(20);
-    textFont('Helvetica');
     fill(color);
     rect(x, y, width, height, 10);
     fill(255);
@@ -439,7 +448,6 @@ function drawTeamSection(teamName, color, players, team, x, y, width) {
     push();
     textAlign(LEFT, TOP);
     textSize(16);
-    textFont('Helvetica');
     fill(255);
 
     for (const player of playersToShow) {
@@ -521,7 +529,6 @@ function drawPlayer(player, playerId) {
         fill(255);
         textAlign(CENTER);
         textSize(16);
-        textFont(customFont);
         text(player.username, tank.x + tank.width / 2, tank.y - 25);
         pop();
 

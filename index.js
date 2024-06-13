@@ -29,19 +29,12 @@ const generateHardPoint = () => {
     };
 
     // Check if the area around the hard point is mostly empty
-    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
-        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
+    for (let i = hardPoint.y; i < hardPoint.y + hardPoint.width; i++) {
+        for (let j = hardPoint.x; j < hardPoint.x + hardPoint.height; j++) {
             if (gameMap[i][j] !== 0) {
                 // Not empty, regenerate hard point
                 return generateHardPoint();
             }
-        }
-    }
-
-    // Mark the area as a hard point
-    for (let i = hardPoint.y; i < hardPoint.y + 5; i++) {
-        for (let j = hardPoint.x; j < hardPoint.x + 5; j++) {
-            gameMap[i][j] = 2; // Assuming 2 represents hard points
         }
     }
 
@@ -118,6 +111,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playerMovement', (playerMovement) => {
+        if(!gameState.players[socket.id]) return;
         if (!playerMovement || gameState.players[socket.id].dead) return;
         movementQueue[socket.id] = playerMovement;
     });

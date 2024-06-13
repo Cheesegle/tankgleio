@@ -124,7 +124,7 @@ function setup() {
     }, 1000);
 
     socket.on('pong', () => {
-        ping = performance.now() - lastTick;
+        ping = performance.now() - pingStart;
     });
 
     socket.on('dead', (state) => {

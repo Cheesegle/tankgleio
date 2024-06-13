@@ -15,13 +15,16 @@ const io = socketIo(server);
 
 const tickRate = 1000 / 20;
 
+var roundTime = 20 * 60 * 5;
+
+
 app.use(express.static(path.join(__dirname, 'client')));
 
 const tileSize = 50; // Size of each tile
 let gameMap = generateMap(50, 50, 10, 0.5);
 
 const generateHardPoint = () => {
-    const hardPoint = {
+    let hardPoint = {
         x: Math.floor(Math.random() * (gameMap[0].length - 5)),
         y: Math.floor(Math.random() * (gameMap.length - 5)),
         width: 5,
@@ -43,13 +46,14 @@ const generateHardPoint = () => {
 
 initMap(gameMap, tileSize);
 
-const gameState = {
+let gameState = {
     players: {},
     bullets: {},
     mines: {},
     hardPoint: generateHardPoint(),
     redTeamScore: 0,
-    blueTeamScore: 0
+    blueTeamScore: 0,
+    roundTimeLeft: roundTime
 };
 
 function truncateString(str, num) {
@@ -61,7 +65,7 @@ function truncateString(str, num) {
 }
 
 const getRandomEmptyLocation = (yMin, yMax) => {
-    const emptyLocations = [];
+    let emptyLocations = [];
     for (let i = yMin; i < yMax; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
             if (gameMap[i][j] === 0 &&
@@ -220,6 +224,26 @@ function updatePlayers() {
     }
 }
 
+function newRound() {
+    // Regenerate the map
+    gameMap = generateMap(50, 50, 10, 0.5);
+    initMap(gameMap, tileSize);
+
+    gameState = {
+        players: {},
+        bullets: {},
+        mines: {},
+        hardPoint: generateHardPoint(),
+        redTeamScore: 0,
+        blueTeamScore: 0,
+        roundTimeLeft: roundTime
+    };
+
+    io.emit('dead');
+
+    io.emit('mapUpdate', gameMap);
+};
+
 function isPlayerOnHardPoint(player) {
     // Assuming hard points are represented by value 2 in the game map
     const tileX = Math.floor((player.x + player.width / 2) / tileSize);
@@ -228,6 +252,10 @@ function isPlayerOnHardPoint(player) {
 }
 
 setInterval(() => {
+    gameState.roundTimeLeft--;
+    if(gameState.roundTimeLeft <= 0){
+        newRound();
+    }
     updateMovement(gameState, movementQueue, gameMap, tileSize);
     updateBullets(gameState, gameMap, tileSize, io);
     updateMines(gameState, io);

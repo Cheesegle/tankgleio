@@ -1,9 +1,8 @@
 const { createNoise2D } = require('simplex-noise');
 
-const noise2D = createNoise2D();
-
 const generateMap = (width, height, scale, threshold) => {
-    const array = [];
+    let  noise2D = createNoise2D();
+    let array = [];
     for (let y = 0; y < height; y++) {
         const row = [];
         for (let x = 0; x < width; x++) {

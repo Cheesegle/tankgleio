@@ -15,7 +15,7 @@ const io = socketIo(server);
 
 const tickRate = 1000 / 20;
 
-var roundTime = 20 * 60 * 5;
+var roundTime = 20 * 60 * 4;
 
 
 app.use(express.static(path.join(__dirname, 'client')));
@@ -23,26 +23,54 @@ app.use(express.static(path.join(__dirname, 'client')));
 const tileSize = 50; // Size of each tile
 let gameMap = generateMap(50, 50, 10, 0.5);
 
-const generateHardPoint = () => {
-    let hardPoint = {
-        x: Math.floor(Math.random() * (gameMap[0].length - 5)),
-        y: Math.floor(Math.random() * (gameMap.length - 5)),
-        width: 5,
-        height: 5
-    };
+const removeHardPoint = () => {
+    let hp = gameState.hardPoint; 
 
-    for (let i = hardPoint.y; i < hardPoint.y + hardPoint.width; i++) {
-        for (let j = hardPoint.x; j < hardPoint.x + hardPoint.height; j++) {
-            if (gameMap[i][j] !== 0) {
-                return generateHardPoint(); // Recursively find another location
-            }
-            gameMap[i][j] = 2;
+    for(let i = hp.y; i < hp.y + hp.width; i++){
+        for(let j = hp.x; j < hp.x + hp.height; j++){
+            gameMap[i][j]=0;
+        }
+    }
+}
+const generateHardPoint = () => {
+    const possiblePositions = [];
+    for (let i = 0; i < gameMap.length - 5; i++) {
+        for (let j = 0; j < gameMap[0].length - 5; j++) {
+            possiblePositions.push({ x: j, y: i });
         }
     }
 
-    return hardPoint; // Return the valid hard point location
-};
+    for (let i = possiblePositions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [possiblePositions[i], possiblePositions[j]] = [possiblePositions[j], possiblePositions[i]];
+    }
 
+    for (const position of possiblePositions) {
+        const { x, y } = position;
+        let isValid = true;
+
+        for (let i = y; i < y + 5; i++) {
+            for (let j = x; j < x + 5; j++) {
+                if (gameMap[i][j] !== 0) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (!isValid) break;
+        }
+
+        if (isValid) {
+            for (let i = y; i < y + 5; i++) {
+                for (let j = x; j < x + 5; j++) {
+                    gameMap[i][j] = 2;
+                }
+            }
+            return { x, y, width: 5, height: 5 };
+        }
+    }
+
+    return null;
+};
 
 initMap(gameMap, tileSize);
 
@@ -53,7 +81,8 @@ let gameState = {
     hardPoint: generateHardPoint(),
     redTeamScore: 0,
     blueTeamScore: 0,
-    roundTimeLeft: roundTime
+    roundTimeLeft: roundTime,
+    nextRotation: 10*60
 };
 
 function truncateString(str, num) {
@@ -236,7 +265,8 @@ function newRound() {
         hardPoint: generateHardPoint(),
         redTeamScore: 0,
         blueTeamScore: 0,
-        roundTimeLeft: roundTime
+        roundTimeLeft: roundTime,
+        nextRotation: 10*60
     };
 
     io.emit('dead');
@@ -257,9 +287,17 @@ function isPlayerOnHardPoint(player) {
 
 setInterval(() => {
     gameState.roundTimeLeft--;
+    gameState.nextRotation--;
     if (gameState.roundTimeLeft <= 0) {
         newRound();
     }
+
+    if(gameState.nextRotation <= 0){
+        removeHardPoint();
+        gameState.hardPoint = generateHardPoint();
+        gameState.nextRotation = 20 * 60;
+    }
+
     updateMovement(gameState, movementQueue, gameMap, tileSize);
     updateBullets(gameState, gameMap, tileSize, io);
     updateMines(gameState, io);

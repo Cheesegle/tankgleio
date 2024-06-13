@@ -394,10 +394,16 @@ function drawHUD() {
     textAlign(CENTER, TOP); // Center text horizontally, align to the top
     textSize(20);
     fill(255);
-    const minutes = Math.floor((gameState.roundTimeLeft / 20) / 60);
-    const seconds = Math.floor((gameState.roundTimeLeft / 20) % 60);
-    const timeLeftString = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    const roundTime = [Math.floor((gameState.roundTimeLeft / 20) / 60), Math.floor((gameState.roundTimeLeft / 20) % 60)];
+    const rotationTime = [Math.floor((gameState.nextRotation / 20) / 60), Math.floor((gameState.nextRotation/20)%60)];
+    
+    const timeLeftString = `${roundTime[0]}:${roundTime[1] < 10 ? '0' : ''}${roundTime[1]}`;
+    const nextRotation =`${rotationTime[0]}:${rotationTime[1] < 10 ? '0' : ''}${rotationTime[1]}`;
+
     text(`Time Left: ${timeLeftString}`, width / 2, 20);
+
+    textAlign(CENTER, TOP);
+    text(`Next Rotation: ${nextRotation}`, width/2, height-(height/20));
     pop();
 }
 

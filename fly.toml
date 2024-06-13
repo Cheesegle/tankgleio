@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for tankgleio on 2024-06-10T12:09:54-04:00
+# fly.toml app configuration file generated for tankgleio on 2024-06-13T18:31:22-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -17,6 +17,6 @@ primary_region = 'ewr'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1

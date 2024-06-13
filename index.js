@@ -132,6 +132,11 @@ io.on('connection', (socket) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
         spawnLocation = getRandomEmptyLocation(0, gameMap.length);
+        
+        if(Object.keys(gameState.players).length==0){
+            newRound(false);
+        }
+
         if (!gameState.players[socket.id]) {
             let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
             gameState.players[socket.id] = newPlayer;
@@ -253,7 +258,7 @@ function updatePlayers() {
     }
 }
 
-function newRound() {
+function newRound(killEveryone=true) {
     // Regenerate the map
     gameMap = generateMap(50, 50, 10, 0.5);
     initMap(gameMap, tileSize);
@@ -269,7 +274,7 @@ function newRound() {
         nextRotation: 10*60
     };
 
-    io.emit('dead');
+    if(killEveryone) io.emit('dead');
 
     io.emit('mapUpdate', gameMap);
 };
@@ -286,23 +291,25 @@ function isPlayerOnHardPoint(player) {
 }
 
 setInterval(() => {
-    gameState.roundTimeLeft--;
-    gameState.nextRotation--;
-    if (gameState.roundTimeLeft <= 0) {
-        newRound();
+    if(Object.keys(gameState.players).length != 0){
+        gameState.roundTimeLeft--;
+        gameState.nextRotation--;
+        if (gameState.roundTimeLeft <= 0) {
+            newRound();
+        }
+    
+        if(gameState.nextRotation <= 0){
+            removeHardPoint();
+            gameState.hardPoint = generateHardPoint();
+            gameState.nextRotation = 20 * 60;
+        }
+    
+        updateMovement(gameState, movementQueue, gameMap, tileSize);
+        updateBullets(gameState, gameMap, tileSize, io);
+        updateMines(gameState, io);
+        updatePlayers();
+        io.sockets.emit('state', gameState);
     }
-
-    if(gameState.nextRotation <= 0){
-        removeHardPoint();
-        gameState.hardPoint = generateHardPoint();
-        gameState.nextRotation = 20 * 60;
-    }
-
-    updateMovement(gameState, movementQueue, gameMap, tileSize);
-    updateBullets(gameState, gameMap, tileSize, io);
-    updateMines(gameState, io);
-    updatePlayers();
-    io.sockets.emit('state', gameState);
 }, tickRate);
 
 const PORT = process.env.PORT || 3000;

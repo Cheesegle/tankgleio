@@ -496,7 +496,7 @@ function drawBullet(bullet) {
     pop();
 }
 
-function mouseClicked() {
+function mousePressed() {
     if (gameStarted) {
         socket.emit('shoot');
     }

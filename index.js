@@ -22,24 +22,24 @@ let gameMap = generateMap(50, 50, 10, 0.5);
 
 const generateHardPoint = () => {
     const hardPoint = {
-        x: Math.floor(Math.random() * (gameMap[0].length - 5)), // Random x-coordinate
-        y: Math.floor(Math.random() * (gameMap.length - 5)), // Random y-coordinate
+        x: Math.floor(Math.random() * (gameMap[0].length - 5)),
+        y: Math.floor(Math.random() * (gameMap.length - 5)),
         width: 5,
         height: 5
     };
 
-    // Check if the area around the hard point is mostly empty
     for (let i = hardPoint.y; i < hardPoint.y + hardPoint.width; i++) {
         for (let j = hardPoint.x; j < hardPoint.x + hardPoint.height; j++) {
             if (gameMap[i][j] !== 0) {
-                // Not empty, regenerate hard point
-                return generateHardPoint();
+                return generateHardPoint(); // Recursively find another location
             }
+            gameMap[i][j] = 2;
         }
     }
 
-    return hardPoint;
+    return hardPoint; // Return the valid hard point location
 };
+
 
 initMap(gameMap, tileSize);
 

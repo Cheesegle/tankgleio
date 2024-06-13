@@ -374,7 +374,7 @@ function draw() {
     frameCount++;
 
     if (performance.now() - lastUpdate >= 1000) {
-        currentFPS = frameCount;
+        currentFPS = Math.floor(frameRate());
         frameCount = 0;
         lastUpdate = performance.now();
     }

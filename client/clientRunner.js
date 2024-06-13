@@ -554,6 +554,14 @@ function drawPlayer(player, playerId) {
         fill(0, 255, 0);
         rect(healthBarX, healthBarY, currentHealthWidth, healthBarHeight);
         pop();
+
+        if(playerId == socket.id && dist(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2)>600){
+            push();
+            stroke('rgba(0, 255, 0, 0.05)');
+            strokeWeight(6);
+            line(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2);
+            pop();
+        }
     }
 }
 

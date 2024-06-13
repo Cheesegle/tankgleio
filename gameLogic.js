@@ -22,8 +22,8 @@ const checkPlayerTileCollision = (player, tile) => {
     let collided = SAT.testPolygonPolygon(playerRect, tileRect, response);
 
     if (collided) {
-        player.x -= response.overlapV.x;
-        player.y -= response.overlapV.y;
+        player.x -= response.overlapV.x * 1.1;
+        player.y -= response.overlapV.y * 1.1;
     }
 };
 

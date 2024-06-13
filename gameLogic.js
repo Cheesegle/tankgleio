@@ -109,7 +109,7 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
 };
 
 const initMap = (gameMap, tileSize) => {
-    tileIndex = new rbush();-
+    tileIndex = new rbush();
     // Populate the spatial index with tile data
     for (let i = 0; i < gameMap.length; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {

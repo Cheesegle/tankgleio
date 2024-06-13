@@ -24,8 +24,9 @@ const minScalingFactor = 1000;
 let targetScalingFactor = scalingFactor;
 let tiles = [];
 let damageNumbers = [];
-
 let playerTracks = {};
+let ping = 0;
+let pingStart = performance.now();
 
 function rLerp(A, B, w) {
     let CS = (1 - w) * Math.cos(A) + w * Math.cos(B);
@@ -73,6 +74,8 @@ socket.on('team', (team) => {
 });
 
 
+
+
 function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
@@ -109,6 +112,15 @@ function setup() {
 
     socket.on('mapUpdate', (serverTiles) => {
         tiles = serverTiles;
+    });
+
+    setInterval(() => {
+        pingStart = performance.now();
+        socket.emit('ping');
+    }, 1000);
+
+    socket.on('pong', () => {
+        ping = performance.now() - lastTick;
     });
 
     socket.on('dead', (state) => {
@@ -354,6 +366,13 @@ function draw() {
     pop();
     // Draw scoreboard
     drawHUD();
+
+    push();
+    fill(255);
+    textSize(20);
+    text(`Ping: ${ping} ms`, 20, 30);
+    text(`FPS: ${frameRate().toFixed(1)}`, 20, 60);
+    pop();
 }
 
 function drawHUD() {

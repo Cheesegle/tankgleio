@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playerMovement', (playerMovement) => {
-        if(!gameState.players[socket.id]) return;
+        if (!gameState.players[socket.id]) return;
         if (!playerMovement || gameState.players[socket.id].dead) return;
         movementQueue[socket.id] = playerMovement;
     });
@@ -119,7 +119,7 @@ io.on('connection', (socket) => {
     socket.on('shoot', () => {
         let player = gameState.players[socket.id];
         if (!player) return;
-        if(player.dead) return;
+        if (player.dead) return;
         let currentTime = performance.now();
         let lastShotTime = lastShotTimes[socket.id] || 0;
         let shootCooldown = player.shootCooldown; // Adjust cooldown time in milliseconds
@@ -174,6 +174,10 @@ io.on('connection', (socket) => {
             team = 'blue';
         }
         socket.emit('team', team);
+    });
+
+    socket.on('ping', () => {
+        socket.emit('pong');
     });
 
     socket.on('disconnect', () => {

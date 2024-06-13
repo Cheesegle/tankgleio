@@ -382,7 +382,7 @@ function draw() {
     push();
     fill(255);
     textSize(20);
-    text(`Ping: ${ping} ms`, 20, 30);
+    text(`Ping: ${Math.round(ping)} ms`, 20, 30);
     text(`FPS: ${currentFPS}`, 20, 60);
     pop();
 }

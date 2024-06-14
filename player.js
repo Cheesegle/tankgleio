@@ -30,7 +30,7 @@ class Player {
                 this.bulletDamage = 150; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
-                this.shotStunTime = 8;
+                this.shotStunTime = 10;
                 this.color = '#5865F2';
                 break;
             case 'sniper':

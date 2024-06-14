@@ -182,6 +182,16 @@ class Lobby {
         return emptyLocations[Math.floor(Math.random() * emptyLocations.length)];
     }
 
+    removeHardPoint() {
+        let hp = gameState.hardPoint;
+
+        for (let i = hp.y; i < hp.y + hp.width; i++) {
+            for (let j = hp.x; j < hp.x + hp.height; j++) {
+                gameMap[i][j] = 0;
+            }
+        }
+    }
+
     generateHardPoint() {
         const possiblePositions = [];
         for (let i = 0; i < this.gameMap.length - 5; i++) {
@@ -223,6 +233,19 @@ class Lobby {
     }
 
     update() {
+
+
+        this.gameState.roundTimeLeft--;
+        this.gameState.nextRotation--;
+        if (this.gameState.roundTimeLeft <= 0) {
+            this.snewRound();
+        }
+
+        if (this.gameState.nextRotation <= 0) {
+            this.removeHardPoint();
+            this.gameState.hardPoint = this.generateHardPoint();
+            this.gameState.nextRotation = this.tickRate * 60;
+        }
 
         updateMines(this.gameState, this.io)
 
@@ -270,7 +293,7 @@ class Lobby {
             hardPoint: this.generateHardPoint(),
             redTeamScore: 0,
             blueTeamScore: 0,
-            roundTimeLeft: this.tickRate * 60,
+            roundTimeLeft: this.tickRate * 60 * 4,
             nextRotation: this.tickRate * 60
         };
 

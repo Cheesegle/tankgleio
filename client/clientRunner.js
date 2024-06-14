@@ -482,11 +482,18 @@ function drawBullet(bullet) {
         push();
 
         noStroke();
+        
+
         fill(SHADOW);
         ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
 
         fill(bullet.team);
 
+        if(gameState.players[bullet.owner].healRate != undefined && bullet.team == gameState.players[socket.id].team){
+            strokeWeight(3);
+            stroke(0, 245, 10);
+        }
+        
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
         return;

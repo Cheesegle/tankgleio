@@ -165,10 +165,10 @@ io.on('connection', (socket) => {
         if (currentTime - lastShotTime >= shootCooldown) {
             if (player.tankType == 'big') {
                 io.emit('bigShot');
-                player.stun = 4;
+                player.stun = player.shotStunTime;
             } else {
                 io.emit('shot');
-                player.stun = 2;
+                player.stun = player.shotStunTime;
             }
 
             let bullet = new Bullet(

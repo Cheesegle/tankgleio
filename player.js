@@ -30,23 +30,8 @@ class Player {
                 this.bulletDamage = 150; // Reduced damage
                 this.regenRate = 2; // Slightly higher regeneration rate
                 this.bulletBounces = 2;
+                this.shotStunTime = 8;
                 this.color = '#5865F2';
-                break;
-            case 'mineLayer':
-                this.width = 43;
-                this.height = 33;
-                this.hitboxWidth = 38;
-                this.hitboxHeight = 38;
-                this.moveSpeed = 9; // Slightly faster
-                this.maxHealth = 130; // Slightly increased health
-                this.mineCooldown = 2000; // Faster mine cooldown
-                this.shootCooldown = 600; // Balanced shooting
-                this.bulletSpeed = 18; // Balanced bullet speed
-                this.bulletSize = 10;
-                this.bulletDamage = 60; // Balanced damage
-                this.regenRate = 3; // Higher regeneration rate
-                this.bulletBounces = 4; // Increased bullet bounces
-                this.color = '#FEE75C';
                 break;
             case 'sniper':
                 this.width = 43;
@@ -56,12 +41,13 @@ class Player {
                 this.moveSpeed = 9;
                 this.maxHealth = 90; // Reduced health
                 this.mineCooldown = 5000;
-                this.shootCooldown = 1200; // Reduced shoot cooldown
+                this.shootCooldown = 2400; // Reduced shoot cooldown
                 this.bulletSpeed = 35; // Increased bullet speed
                 this.bulletSize = 10;
-                this.bulletDamage = 120;
+                this.bulletDamage = 190;
                 this.regenRate = 2;
                 this.bulletBounces = 1; // Reduced bullet bounces
+                this.shotStunTime = 8;
                 this.color = '#ED4245';
                 break;
             case 'speedy':
@@ -78,6 +64,7 @@ class Player {
                 this.bulletDamage = 50; 
                 this.regenRate = 3;
                 this.bulletBounces = 2;
+                this.shotStunTime = 2;
                 this.color = '#FFFFFF';
                 break;
             case 'healer':
@@ -95,9 +82,9 @@ class Player {
                 this.regenRate = 4;
                 this.bulletBounces = 2;
                 this.healRate = 10; 
+                this.shotStunTime = 2;
                 this.color = '#77B255';
                 break;
-
             case 'normal':
             default:
                 this.width = 43;
@@ -113,6 +100,7 @@ class Player {
                 this.bulletDamage = 100;
                 this.regenRate = 2; // Slightly higher regeneration rate for balance
                 this.bulletBounces = 2;
+                this.shotStunTime = 2;
                 this.color = '#E67E22';
                 break;
         }

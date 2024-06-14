@@ -39,10 +39,12 @@ class Lobby {
 
     setupSocket() {
         this.io.on('connection', (socket) => {
-            this.handleConnection(socket);
-
-            socket.on('disconnect', () => {
-                this.handleDisconnection(socket.id);
+            socket.on('join-lobby', (lobbyId) => {
+                socket.join(lobbyId);
+                // Handle lobby-specific socket events
+                // Example:
+                socket.on('spawn', (data) => this.handleSpawn(socket, data, team, lobbyId));
+                socket.on('disconnect', () => this.handleDisconnection(socket.id, lobbyId));
             });
         });
     }
@@ -288,4 +290,4 @@ class Lobby {
     }
 }
 
-module.exports = Lobby;
+module.exports = { Lobby };

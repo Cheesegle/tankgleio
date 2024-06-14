@@ -78,6 +78,17 @@ socket.on('team', (team) => {
 });
 
 
+function createLobby() {
+    socket.emit('createLobby');
+}
+
+function joinLobby() {
+    socket.emit('joinLobby', document.getElementById('lobbyIdInput').value);
+}
+
+socket.on('lobbyCreated', (lobbyId) => {
+    console.log(lobbyId)
+});
 
 
 function setup() {
@@ -145,8 +156,8 @@ function setup() {
 }
 
 function startGame() {
-    if(gameState && gameState.players[socket.id]){
-        if(gameState.players[socket.id].spawnCooldown > 0) return;
+    if (gameState && gameState.players[socket.id]) {
+        if (gameState.players[socket.id].spawnCooldown > 0) return;
     }
     // Get the username from the input field
     username = document.getElementById('usernameInput').value;

@@ -12,6 +12,7 @@ class Player {
         this.team = team;
         this.stun = 0;
         this.score = score;
+        this.spawnCooldown = 0;
         this.dead = false;
 
         // Set properties based on the tank type

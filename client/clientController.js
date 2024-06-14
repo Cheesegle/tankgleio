@@ -22,6 +22,8 @@ const keyDownHandler = (e) => {
         playerMovement.up = true;
     } else if (e.keyCode == 40 || e.keyCode == 83) {
         playerMovement.down = true;
+    } else if (e.keyCode == 27){
+        socket.emit('esc');
     }
 };
 //Function that runs when a key is released, and updates the object

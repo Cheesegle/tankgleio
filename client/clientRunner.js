@@ -145,6 +145,9 @@ function setup() {
 }
 
 function startGame() {
+    if(gameState && gameState.players[socket.id]){
+        if(gameState.players[socket.id].spawnCooldown > 0) return;
+    }
     // Get the username from the input field
     username = document.getElementById('usernameInput').value;
 

@@ -13,10 +13,10 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const tickRate = 1000 / 20;
+const tickRate = 20;
+const tickTime = 1000/tickRate
 
-var roundTime = 20 * 60 * 4;
-
+var roundTime = tickRate * 60 * 4;
 
 app.use(express.static(path.join(__dirname, 'client')));
 
@@ -24,11 +24,11 @@ const tileSize = 50; // Size of each tile
 let gameMap = generateMap(50, 50, 10, 0.5);
 
 const removeHardPoint = () => {
-    let hp = gameState.hardPoint; 
+    let hp = gameState.hardPoint;
 
-    for(let i = hp.y; i < hp.y + hp.width; i++){
-        for(let j = hp.x; j < hp.x + hp.height; j++){
-            gameMap[i][j]=0;
+    for (let i = hp.y; i < hp.y + hp.width; i++) {
+        for (let j = hp.x; j < hp.x + hp.height; j++) {
+            gameMap[i][j] = 0;
         }
     }
 }
@@ -82,7 +82,7 @@ let gameState = {
     redTeamScore: 0,
     blueTeamScore: 0,
     roundTimeLeft: roundTime,
-    nextRotation: 20*60
+    nextRotation: tickRate * 60
 };
 
 function truncateString(str, num) {
@@ -132,15 +132,15 @@ io.on('connection', (socket) => {
         socket.emit('mapUpdate', gameMap);
         let spawnLocation;
         spawnLocation = getRandomEmptyLocation(0, gameMap.length);
-        
-        if(Object.keys(gameState.players).length==0){
+
+        if (Object.keys(gameState.players).length == 0) {
             newRound(false);
         }
 
         if (!gameState.players[socket.id]) {
             let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
             gameState.players[socket.id] = newPlayer;
-        } else if (gameState.players[socket.id].dead === true) {
+        } else if (gameState.players[socket.id].dead === true && gameState.players[socket.id].spawnCooldown  === 0) {
             let player = gameState.players[socket.id];
             gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score)
         } else {
@@ -155,6 +155,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('shoot', () => {
+        if (!gameState.players[socket.id]) return;
         let player = gameState.players[socket.id];
         if (!player) return;
         if (player.dead) return;
@@ -190,6 +191,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('layMine', () => {
+        if (!gameState.players[socket.id]) return;
         let player = gameState.players[socket.id];
         if (!player || player.dead) return;
         let currentTime = performance.now();
@@ -214,9 +216,19 @@ io.on('connection', (socket) => {
         socket.emit('team', team);
     });
 
+    socket.on('esc', () => {
+        if (!gameState.players[socket.id]) return;
+        if (gameState.players[socket.id].spawnCooldown > 0) return;
+        gameState.players[socket.id].dead = true;
+        socket.emit('dead');
+        io.emit('explodeSound');
+        gameState.players[socket.id].spawnCooldown = 5 * tickRate;
+    });
+
     socket.on('ping', () => {
         socket.emit('pong');
     });
+
 
     socket.on('disconnect', () => {
         delete gameState.players[socket.id];
@@ -227,20 +239,23 @@ io.on('connection', (socket) => {
 function updatePlayers() {
     for (const playerId in gameState.players) {
         let player = gameState.players[playerId];
+        if (player.spawnCooldown > 0) {
+            player.spawnCooldown--;
+        }
         if (!player.dead) {
             // Check if the player is on a hard point
             if (isPlayerOnHardPoint(player)) {
 
                 //add score to player
-                player.score += tickRate / 1000;
+                player.score += tickTime / 1000;
 
                 // Add score to the player's team
                 if (player.team === 'red') {
                     // Increment red team score
-                    gameState.redTeamScore += tickRate / 1000;
+                    gameState.redTeamScore += tickTime / 1000;
                 } else {
                     // Increment blue team score
-                    gameState.blueTeamScore += tickRate / 1000;
+                    gameState.blueTeamScore += tickTime / 1000;
                 }
 
             }
@@ -258,7 +273,7 @@ function updatePlayers() {
     }
 }
 
-function newRound(killEveryone=true) {
+function newRound(killEveryone = true) {
     // Regenerate the map
     gameMap = generateMap(50, 50, 10, 0.5);
     initMap(gameMap, tileSize);
@@ -271,10 +286,10 @@ function newRound(killEveryone=true) {
         redTeamScore: 0,
         blueTeamScore: 0,
         roundTimeLeft: roundTime,
-        nextRotation: 20*60
+        nextRotation: tickRate * 60
     };
 
-    if(killEveryone) io.emit('dead');
+    if (killEveryone) io.emit('dead');
 
     io.emit('mapUpdate', gameMap);
 };
@@ -291,26 +306,26 @@ function isPlayerOnHardPoint(player) {
 }
 
 setInterval(() => {
-    if(Object.keys(gameState.players).length != 0){
+    if (Object.keys(gameState.players).length != 0) {
         gameState.roundTimeLeft--;
         gameState.nextRotation--;
         if (gameState.roundTimeLeft <= 0) {
             newRound();
         }
-    
-        if(gameState.nextRotation <= 0){
+
+        if (gameState.nextRotation <= 0) {
             removeHardPoint();
             gameState.hardPoint = generateHardPoint();
-            gameState.nextRotation = 20 * 60;
+            gameState.nextRotation = tickRate * 60;
         }
-    
+
         updateMovement(gameState, movementQueue, gameMap, tileSize);
         updateBullets(gameState, gameMap, tileSize, io);
         updateMines(gameState, io);
         updatePlayers();
         io.sockets.emit('state', gameState);
     }
-}, tickRate);
+}, tickTime);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

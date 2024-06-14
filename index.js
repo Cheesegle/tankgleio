@@ -20,7 +20,7 @@ function createLobby() {
     return lobbyId;
 }
 
-function joinLobby(socket, lobbyId) {
+function joinLobby(socket, lobbyId, prevLobby) {
     const lobby = lobbies[lobbyId];
     if (lobby) {
         socket.join(lobbyId);
@@ -29,10 +29,7 @@ function joinLobby(socket, lobbyId) {
 }
 
 io.on('connection', (socket) => {
-
-    socket.on('join-lobby', (lobbyId) => {
-        socket.join(lobbyId);
-    });
+    let prevLobby;
 
     socket.on('createLobby', () => {
         const lobbyId = createLobby();
@@ -40,6 +37,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('joinLobby', (lobbyId) => {
+        if (prevLobby) {
+            if (lobbies[prevLobby]) {
+                lobbies[prevLobby].handleDisconnection(socket.id);
+                socket.leave(prevLobby);
+            }
+        }
+        prevLobby = lobbyId;
         joinLobby(socket, lobbyId);
     });
 
@@ -59,7 +63,7 @@ const tickTime = 1000 / tickRate;
 setInterval(() => {
     for (const lobbyId in lobbies) {
         let lobby = lobbies[lobbyId];
-        if(lobby.emptytime > tickRate * 20 && lobby.getPlayerCount() === 0){
+        if (lobby.emptytime > tickRate * 20 && lobby.getPlayerCount() === 0) {
             delete lobbies[lobbyId];
         }
         lobby.update();

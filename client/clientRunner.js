@@ -88,6 +88,12 @@ function createLobby() {
 document.getElementById('startButton').disabled = true;
 
 function joinLobby(lobbyId) {
+    gameState = null;
+    prevState = null;
+    lastTick = null;
+    lastTickDiff = null;
+    tiles = [];
+
     socket.emit('joinLobby', lobbyId);
     document.getElementById('startButton').disabled = false;
 }

@@ -77,8 +77,44 @@ socket.on('team', (team) => {
     }
 });
 
+function requestLobbyList() {
+    socket.emit('listLobbies');
+}
 
+function createLobby() {
+    socket.emit('createLobby');
+}
 
+document.getElementById('startButton').disabled = true;
+
+function joinLobby(lobbyId) {
+    gameState = null;
+    prevState = null;
+    lastTick = null;
+    lastTickDiff = null;
+    tiles = [];
+
+    socket.emit('joinLobby', lobbyId);
+    document.getElementById('startButton').disabled = false;
+}
+
+socket.on('lobbyCreated', (lobbyId) => {
+    requestLobbyList();
+    joinLobby(lobbyId);
+});
+
+socket.on('lobbyList', (lobbyList) => {
+    const lobbyListElement = document.getElementById('lobbyList');
+    lobbyListElement.innerHTML = ''; // Clear existing list
+
+    lobbyList.forEach((lobby) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Lobby ID: ${lobby.id} - Players: ${lobby.players}/${lobby.maxPlayers}`;
+        listItem.addEventListener('click', () => joinLobby(lobby.id)); // Add click event to join lobby
+        listItem.style.cursor = 'pointer'; // Change cursor to pointer on hover
+        lobbyListElement.appendChild(listItem);
+    });
+});
 
 function setup() {
     // Create canvas
@@ -88,6 +124,8 @@ function setup() {
 
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';
+
+    requestLobbyList();
 
     // Event listener for start button
     document.getElementById('startButton').addEventListener('click', startGame);
@@ -145,8 +183,8 @@ function setup() {
 }
 
 function startGame() {
-    if(gameState && gameState.players[socket.id]){
-        if(gameState.players[socket.id].spawnCooldown > 0) return;
+    if (gameState && gameState.players[socket.id]) {
+        if (gameState.players[socket.id].spawnCooldown > 0) return;
     }
     // Get the username from the input field
     username = document.getElementById('usernameInput').value;

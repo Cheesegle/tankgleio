@@ -85,6 +85,8 @@ function createLobby() {
     socket.emit('createLobby');
 }
 
+document.getElementById('startButton').disabled = true;
+
 function joinLobby(lobbyId) {
     socket.emit('joinLobby', lobbyId);
     document.getElementById('startButton').disabled = false;
@@ -92,7 +94,7 @@ function joinLobby(lobbyId) {
 
 socket.on('lobbyCreated', (lobbyId) => {
     requestLobbyList();
-    socket.emit('joinLobby', lobbyId);
+    joinLobby(lobbyId);
 });
 
 socket.on('lobbyList', (lobbyList) => {

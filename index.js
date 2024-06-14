@@ -29,6 +29,11 @@ function joinLobby(socket, lobbyId) {
 }
 
 io.on('connection', (socket) => {
+
+    socket.on('join-lobby', (lobbyId) => {
+        socket.join(lobbyId);
+    });
+
     socket.on('createLobby', () => {
         const lobbyId = createLobby();
         socket.emit('lobbyCreated', lobbyId);
@@ -46,9 +51,6 @@ io.on('connection', (socket) => {
         }));
         socket.emit('lobbyList', lobbyList);
     });
-
-    socket.on('disconnect', () => {
-    });
 });
 
 const tickRate = 20;
@@ -56,8 +58,12 @@ const tickTime = 1000 / tickRate;
 
 setInterval(() => {
     for (const lobbyId in lobbies) {
-        lobbies[lobbyId].update();
-        io.to(lobbyId).emit('state', lobbies[lobbyId].gameState);
+        let lobby = lobbies[lobbyId];
+        if(lobby.age > tickRate * 60 && lobby.getPlayerCount() === 0){
+            delete lobbies[lobbyId];
+        }
+        lobby.update();
+        io.to(lobbyId).emit('state', lobby.gameState);
     }
 }, tickTime);
 

@@ -33,24 +33,11 @@ class Lobby {
         this.movementQueue = {};
         this.lastShotTimes = {};
         this.lastMineTimes = {};
-
-        this.setupSocket();
+        this.age = 0;
     }
 
-    getPlayerCount(){
+    getPlayerCount() {
         return Object.keys(this.gameState.players).length;
-    }
-
-    setupSocket() {
-        this.io.on('connection', (socket) => {
-            socket.on('join-lobby', (lobbyId) => {
-                socket.join(lobbyId);
-                // Handle lobby-specific socket events
-                // Example:
-                socket.on('spawn', (data) => this.handleSpawn(socket, data, team, lobbyId));
-                socket.on('disconnect', () => this.handleDisconnection(socket.id, lobbyId));
-            });
-        });
     }
 
     handleConnection(socket) {
@@ -66,10 +53,11 @@ class Lobby {
         socket.on('switchTeam', () => this.handleSwitchTeam(socket));
         socket.on('esc', () => this.handleEsc(socket.id));
         socket.on('ping', () => socket.emit('pong'));
+        socket.on('disconnect', () => this.handleDisconnection(socket.id));
     }
 
     handleDisconnection(socketId) {
-        delete this.players[socketId];
+        delete this.gameState.players[socketId];
         delete this.movementQueue[socketId];
     }
 
@@ -237,8 +225,7 @@ class Lobby {
     }
 
     update() {
-
-
+        this.age++;
         this.gameState.roundTimeLeft--;
         this.gameState.nextRotation--;
         if (this.gameState.roundTimeLeft <= 0) {

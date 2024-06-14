@@ -84,6 +84,8 @@ function setup() {
     // Create canvas
     createCanvas(windowWidth, windowHeight);
 
+    noCursor();
+
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';
 
@@ -218,175 +220,175 @@ function drawExplosionEffect(x, y, radius) {
 }
 
 function draw() {
-    if (!gameStarted) return;
-    if (!gameState) return;
-
-    // Clear the canvas
     clear();
+    if (gameStarted && gameState) {
+        textFont(customFont);
 
-    textFont(customFont);
+        push();
+        updateZoom();
 
-    push();
-    updateZoom();
+        // Apply scaling
+        scale(windowWidth / scalingFactor);
 
-    // Apply scaling
-    scale(windowWidth / scalingFactor);
+        // Calculate scaled canvas dimensions
+        scaledWidth = windowWidth / (windowWidth / scalingFactor);
+        scaledHeight = windowHeight / (windowWidth / scalingFactor);
 
-    // Calculate scaled canvas dimensions
-    scaledWidth = windowWidth / (windowWidth / scalingFactor);
-    scaledHeight = windowHeight / (windowWidth / scalingFactor);
+        background('#D8B077');
 
-    background('#D8B077');
+        lastTickDiff = (performance.now() - lastTick) / tickRate;
 
-    lastTickDiff = (performance.now() - lastTick) / tickRate;
-
-    // Update lerped player position
-    if (gameState && gameState.players && prevState) {
-        if (gameState.players[socket.id] && prevState.players[socket.id]) {
-            lerpedPlayerX = lerp(prevState.players[socket.id].x, gameState.players[socket.id].x, lastTickDiff);
-            lerpedPlayerY = lerp(prevState.players[socket.id].y, gameState.players[socket.id].y, lastTickDiff);
-            playerWidth = gameState.players[socket.id].width;
-            playerHeight = gameState.players[socket.id].height;
-        }
-    }
-
-    // Update camera position with lerping
-    playerCameraX = lerp(playerCameraX, lerpedPlayerX - scaledWidth / 2, cameraLerpAmount);
-    playerCameraY = lerp(playerCameraY, lerpedPlayerY - scaledHeight / 2, cameraLerpAmount);
-
-    // Translate canvas to follow player with interpolated camera position
-    translate(-playerCameraX, -playerCameraY);
-
-    //render tile shadow
-    if (gameState && tiles) {
-        for (let i = 0; i < tiles.length; i++) {
-            for (let j = 0; j < tiles[i].length; j++) {
-                if (tiles[i][j] === 1) {
-                    push();
-                    fill(SHADOW); // Example tile color
-                    noStroke();
-                    rect(j * tileSize + 8, i * tileSize + 8, tileSize, tileSize);
-                    pop();
-                }
+        // Update lerped player position
+        if (gameState && gameState.players && prevState) {
+            if (gameState.players[socket.id] && prevState.players[socket.id]) {
+                lerpedPlayerX = lerp(prevState.players[socket.id].x, gameState.players[socket.id].x, lastTickDiff);
+                lerpedPlayerY = lerp(prevState.players[socket.id].y, gameState.players[socket.id].y, lastTickDiff);
+                playerWidth = gameState.players[socket.id].width;
+                playerHeight = gameState.players[socket.id].height;
             }
         }
-    }
 
-    drawHardpoints();
+        // Update camera position with lerping
+        playerCameraX = lerp(playerCameraX, lerpedPlayerX - scaledWidth / 2, cameraLerpAmount);
+        playerCameraY = lerp(playerCameraY, lerpedPlayerY - scaledHeight / 2, cameraLerpAmount);
 
+        // Translate canvas to follow player with interpolated camera position
+        translate(-playerCameraX, -playerCameraY);
 
-
-    // Update and render tracks
-    for (let playerId in playerTracks) {
-        let tracks = playerTracks[playerId].tracks;
-        for (let i = tracks.length - 1; i >= 0; i--) {
-            const track = tracks[i];
-
-            if (track.delete) {
-                tracks.splice(i, 1);
-                continue;
-            }
-
-            track.update();
-            track.render();
-        }
-    }
-
-    drawMines();
-
-    // Draw bullets
-    if (gameState && gameState.bullets) {
-        for (let bulletId in gameState.bullets) {
-            let bullet = gameState.bullets[bulletId];
-            if (prevState && prevState.bullets[bulletId]) {
-                if (bullet.damage < prevState.bullets[bulletId].damage) {
-                    createDamageNumber(bullet.x, bullet.y, prevState.bullets[bulletId].damage - bullet.damage);
-                }
-            }
-            drawBullet(bullet);
-        }
-    }
-
-    // Draw players
-    if (gameState && gameState.players && prevState) {
-        for (let playerId in gameState.players) {
-            let player = gameState.players[playerId];
-            if (!player.dead && prevState.players[playerId]) {
-                drawPlayer(player, playerId);
-
-                if (player.health < prevState.players[playerId].health) {
-                    createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
-                } else if (player.health > prevState.players[playerId].health + player.regenRate) {
-                    createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
-                }
-
-                // Store player tracks
-                if (!playerTracks[playerId]) {
-                    playerTracks[playerId] = {};
-                    playerTracks[playerId].tracks = [];
-                    playerTracks[playerId].count = 0;
-                }
-                playerTracks[playerId].count++;
-
-                let threshold = Math.ceil(4 / player.moveSpeed * deltaTime);
-
-                if (playerTracks[playerId].count >= threshold) {
-                    if (prevState && prevState.players[playerId]) {
-                        let prevPlayer = prevState.players[playerId];
-                        if (prevPlayer.x !== player.x || prevPlayer.y !== player.y) {
-                            playerTracks[playerId].tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
-                        }
+        //render tile shadow
+        if (gameState && tiles) {
+            for (let i = 0; i < tiles.length; i++) {
+                for (let j = 0; j < tiles[i].length; j++) {
+                    if (tiles[i][j] === 1) {
+                        push();
+                        fill(SHADOW); // Example tile color
+                        noStroke();
+                        rect(j * tileSize + 8, i * tileSize + 8, tileSize, tileSize);
+                        pop();
                     }
-                    playerTracks[playerId].count = 0;
                 }
             }
         }
-    }
 
-    // Render tiles
-    if (gameState && tiles) {
-        for (let i = 0; i < tiles.length; i++) {
-            for (let j = 0; j < tiles[i].length; j++) {
-                if (tiles[i][j] === 1) {
-                    push();
-                    fill("#c9b7b1");
-                    strokeWeight(2);
-                    rect(j * tileSize, i * tileSize, tileSize, tileSize);
-                    pop();
+        drawHardpoints();
+
+
+
+        // Update and render tracks
+        for (let playerId in playerTracks) {
+            let tracks = playerTracks[playerId].tracks;
+            for (let i = tracks.length - 1; i >= 0; i--) {
+                const track = tracks[i];
+
+                if (track.delete) {
+                    tracks.splice(i, 1);
+                    continue;
+                }
+
+                track.update();
+                track.render();
+            }
+        }
+
+        drawMines();
+
+        // Draw bullets
+        if (gameState && gameState.bullets) {
+            for (let bulletId in gameState.bullets) {
+                let bullet = gameState.bullets[bulletId];
+                if (prevState && prevState.bullets[bulletId]) {
+                    if (bullet.damage < prevState.bullets[bulletId].damage) {
+                        createDamageNumber(bullet.x, bullet.y, prevState.bullets[bulletId].damage - bullet.damage);
+                    }
+                }
+                drawBullet(bullet);
+            }
+        }
+
+        // Draw players
+        if (gameState && gameState.players && prevState) {
+            for (let playerId in gameState.players) {
+                let player = gameState.players[playerId];
+                if (!player.dead && prevState.players[playerId]) {
+                    drawPlayer(player, playerId);
+
+                    if (player.health < prevState.players[playerId].health) {
+                        createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
+                    } else if (player.health > prevState.players[playerId].health + player.regenRate) {
+                        createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
+                    }
+
+                    // Store player tracks
+                    if (!playerTracks[playerId]) {
+                        playerTracks[playerId] = {};
+                        playerTracks[playerId].tracks = [];
+                        playerTracks[playerId].count = 0;
+                    }
+                    playerTracks[playerId].count++;
+
+                    let threshold = Math.ceil(4 / player.moveSpeed * deltaTime);
+
+                    if (playerTracks[playerId].count >= threshold) {
+                        if (prevState && prevState.players[playerId]) {
+                            let prevPlayer = prevState.players[playerId];
+                            if (prevPlayer.x !== player.x || prevPlayer.y !== player.y) {
+                                playerTracks[playerId].tracks.push(new Track(player.x, player.y, player.width, player.height, player.angle));
+                            }
+                        }
+                        playerTracks[playerId].count = 0;
+                    }
                 }
             }
         }
-    }
 
-    // Update and render damage numbers
-    for (let i = damageNumbers.length - 1; i >= 0; i--) {
-        const number = damageNumbers[i];
-        number.update();
-        number.render();
-        if (number.timer <= 0) {
-            damageNumbers.splice(i, 1); // Remove the damage number when its timer expires
+        // Render tiles
+        if (gameState && tiles) {
+            for (let i = 0; i < tiles.length; i++) {
+                for (let j = 0; j < tiles[i].length; j++) {
+                    if (tiles[i][j] === 1) {
+                        push();
+                        fill("#c9b7b1");
+                        strokeWeight(2);
+                        rect(j * tileSize, i * tileSize, tileSize, tileSize);
+                        pop();
+                    }
+                }
+            }
         }
+
+        // Update and render damage numbers
+        for (let i = damageNumbers.length - 1; i >= 0; i--) {
+            const number = damageNumbers[i];
+            number.update();
+            number.render();
+            if (number.timer <= 0) {
+                damageNumbers.splice(i, 1); // Remove the damage number when its timer expires
+            }
+        }
+
+        drawMineExplosions();
+        pop();
+        // Draw scoreboard
+        drawHUD();
+
+        frameCount++;
+
+        if (performance.now() - lastUpdate >= 1000) {
+            currentFPS = Math.floor(frameRate());
+            frameCount = 0;
+            lastUpdate = performance.now();
+        }
+
+        push();
+        fill(255);
+        textSize(20);
+        text(`Ping: ${Math.round(ping)} ms`, 20, 30);
+        text(`FPS: ${currentFPS}`, 20, 60);
+        pop();
+
     }
 
-    drawMineExplosions();
-    pop();
-    // Draw scoreboard
-    drawHUD();
-
-    frameCount++;
-
-    if (performance.now() - lastUpdate >= 1000) {
-        currentFPS = Math.floor(frameRate());
-        frameCount = 0;
-        lastUpdate = performance.now();
-    }
-
-    push();
-    fill(255);
-    textSize(20);
-    text(`Ping: ${Math.round(ping)} ms`, 20, 30);
-    text(`FPS: ${currentFPS}`, 20, 60);
-    pop();
+    drawCrosshair();
 }
 
 function drawHUD() {
@@ -470,6 +472,17 @@ function drawTeamSection(teamName, color, players, team, x, y, width) {
     pop();
 
     return y;
+}
+
+
+function drawCrosshair() {
+    push();
+    translate(mouseX, mouseY);
+    strokeWeight(4);
+    stroke(0, 255, 0);
+    line(-10, 0, 10, 0);
+    line(0, -10, 0, 10);
+    pop();
 }
 
 

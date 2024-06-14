@@ -559,7 +559,8 @@ function drawPlayer(player, playerId) {
             push();
             stroke('rgba(0, 255, 0, 0.05)');
             strokeWeight(6);
-            line(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2);
+            line(lerpedPlayerX+player.width/2, lerpedPlayerY+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2,  gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2)
+            //line(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2);
             pop();
         }
     }

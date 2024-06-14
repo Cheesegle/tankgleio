@@ -59,7 +59,7 @@ const tickTime = 1000 / tickRate;
 setInterval(() => {
     for (const lobbyId in lobbies) {
         let lobby = lobbies[lobbyId];
-        if(lobby.age > tickRate * 60 && lobby.getPlayerCount() === 0){
+        if(lobby.emptytime > tickRate * 20 && lobby.getPlayerCount() === 0){
             delete lobbies[lobbyId];
         }
         lobby.update();

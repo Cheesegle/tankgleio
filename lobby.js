@@ -33,7 +33,7 @@ class Lobby {
         this.movementQueue = {};
         this.lastShotTimes = {};
         this.lastMineTimes = {};
-        this.age = 0;
+        this.emptytime = 0;
     }
 
     getPlayerCount() {
@@ -225,7 +225,9 @@ class Lobby {
     }
 
     update() {
-        this.age++;
+        if (this.getPlayerCount() === 0) {
+            this.emptytime++;
+        }
         this.gameState.roundTimeLeft--;
         this.gameState.nextRotation--;
         if (this.gameState.roundTimeLeft <= 0) {

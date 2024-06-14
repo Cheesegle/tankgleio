@@ -316,7 +316,7 @@ function draw() {
 
                 if (player.health < prevState.players[playerId].health) {
                     createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
-                }else if(player.health > prevState.players[playerId].health+player.regenRate){
+                } else if (player.health > prevState.players[playerId].health + player.regenRate) {
                     createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
                 }
 
@@ -397,15 +397,15 @@ function drawHUD() {
     textSize(20);
     fill(255);
     const roundTime = [Math.floor((gameState.roundTimeLeft / 20) / 60), Math.floor((gameState.roundTimeLeft / 20) % 60)];
-    const rotationTime = [Math.floor((gameState.nextRotation / 20) / 60), Math.floor((gameState.nextRotation/20)%60)];
-    
+    const rotationTime = [Math.floor((gameState.nextRotation / 20) / 60), Math.floor((gameState.nextRotation / 20) % 60)];
+
     const timeLeftString = `${roundTime[0]}:${roundTime[1] < 10 ? '0' : ''}${roundTime[1]}`;
-    const nextRotation =`${rotationTime[0]}:${rotationTime[1] < 10 ? '0' : ''}${rotationTime[1]}`;
+    const nextRotation = `${rotationTime[0]}:${rotationTime[1] < 10 ? '0' : ''}${rotationTime[1]}`;
 
     text(`Time Left: ${timeLeftString}`, width / 2, 20);
 
     textAlign(CENTER, TOP);
-    text(`Next Rotation: ${nextRotation}`, width/2, height-(height/20));
+    text(`Next Rotation: ${nextRotation}`, width / 2, height - (height / 20));
     pop();
 }
 
@@ -482,18 +482,20 @@ function drawBullet(bullet) {
         push();
 
         noStroke();
-        
+
 
         fill(SHADOW);
         ellipse(lerpedX + 4, lerpedY + 4, bullet.size);
 
         fill(bullet.team);
 
-        if(gameState.players[bullet.owner].healRate != undefined && bullet.team == gameState.players[socket.id].team){
-            strokeWeight(3);
-            stroke(0, 245, 10);
+        if (gameState.players[bullet.owner]) {
+            if (gameState.players[bullet.owner].healRate != undefined && bullet.team == gameState.players[socket.id].team) {
+                strokeWeight(3);
+                stroke(0, 245, 10);
+            }
         }
-        
+
         ellipse(lerpedX, lerpedY, bullet.size);
         pop();
         return;
@@ -564,11 +566,11 @@ function drawPlayer(player, playerId) {
         rect(healthBarX, healthBarY, currentHealthWidth, healthBarHeight);
         pop();
 
-        if(playerId == socket.id && dist(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2)>600){
+        if (playerId == socket.id && dist(player.x + player.width / 2, player.y + player.height / 2, gameState.hardPoint.x * tileSize + gameState.hardPoint.height * tileSize / 2, gameState.hardPoint.y * tileSize + gameState.hardPoint.height * tileSize / 2) > 600) {
             push();
             stroke('rgba(0, 255, 0, 0.1)');
             strokeWeight(6);
-            line(lerpedPlayerX+player.width/2, lerpedPlayerY+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2,  gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2)
+            line(lerpedPlayerX + player.width / 2, lerpedPlayerY + player.height / 2, gameState.hardPoint.x * tileSize + gameState.hardPoint.height * tileSize / 2, gameState.hardPoint.y * tileSize + gameState.hardPoint.height * tileSize / 2)
             //line(player.x+player.width/2, player.y+player.height/2, gameState.hardPoint.x*tileSize+gameState.hardPoint.height*tileSize/2, gameState.hardPoint.y*tileSize+gameState.hardPoint.height*tileSize/2);
             pop();
         }
@@ -618,7 +620,7 @@ function updateTankInfo() {
             break;
         case 'healer':
             info = 'A tank that has healing capabilities. Bullets bounce twice.';
-            break; 
+            break;
         default:
             info = 'Select a tank type to see its description.';
     }

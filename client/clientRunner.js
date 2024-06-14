@@ -77,19 +77,43 @@ socket.on('team', (team) => {
     }
 });
 
+function requestLobbyList() {
+    socket.emit('listLobbies');
+}
 
 function createLobby() {
     socket.emit('createLobby');
 }
 
-function joinLobby() {
-    socket.emit('joinLobby', document.getElementById('lobbyIdInput').value);
+function joinLobby(lobbyId) {
+    socket.emit('joinLobby', lobbyId, (success) => {
+        if (success) {
+            // Enable the start game button
+            document.getElementById('startButton').disabled = false;
+        } else {
+            // Handle failure to join lobby (optional)
+            console.log(`Failed to join lobby ${lobbyId}`);
+        }
+    });
 }
 
 socket.on('lobbyCreated', (lobbyId) => {
-    console.log(lobbyId)
+    requestLobbyList();
+    socket.emit('joinLobby', lobbyId);
 });
 
+socket.on('lobbyList', (lobbyList) => {
+    const lobbyListElement = document.getElementById('lobbyList');
+    lobbyListElement.innerHTML = ''; // Clear existing list
+
+    lobbyList.forEach((lobby) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Lobby ID: ${lobby.id} - Players: ${lobby.players}/${lobby.maxPlayers}`;
+        listItem.addEventListener('click', () => joinLobby(lobby.id)); // Add click event to join lobby
+        listItem.style.cursor = 'pointer'; // Change cursor to pointer on hover
+        lobbyListElement.appendChild(listItem);
+    });
+});
 
 function setup() {
     // Create canvas
@@ -99,6 +123,8 @@ function setup() {
 
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';
+
+    requestLobbyList();
 
     // Event listener for start button
     document.getElementById('startButton').addEventListener('click', startGame);

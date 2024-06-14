@@ -23,13 +23,19 @@
             </select>
             <div id="tankInfo" class="tankInfo">A balanced tank with average speed and firepower.</div>
         </div>
-        <button id="startButton">Start Game</button>
+        <button id="startButton" disabled>Start Game</button>
         <br>
         <button id="switchTeamButton" onclick="switchTeam()">Switch Team</button>
+        <br>
         <div id="lobbyMenu">
-            <input type="text" id="lobbyIdInput" placeholder="Enter Lobby ID">
-            <button onclick="joinLobby()">Join Lobby</button>
             <button onclick="createLobby()">Create New Lobby</button>
+        </div>
+        <!-- Lobby list -->
+        <div id="lobbyList">
+            <h3>Available Lobbies (click to join)</h3>
+            <ul id="lobbyUl">
+                <!-- List of lobbies will be dynamically added here -->
+            </ul>
         </div>
         <p>
             OBJECTIVE:<br>

@@ -37,6 +37,10 @@ class Lobby {
         this.setupSocket();
     }
 
+    getPlayerCount(){
+        return Object.keys(this.gameState.players).length;
+    }
+
     setupSocket() {
         this.io.on('connection', (socket) => {
             socket.on('join-lobby', (lobbyId) => {
@@ -183,11 +187,11 @@ class Lobby {
     }
 
     removeHardPoint() {
-        let hp = gameState.hardPoint;
+        let hp = this.gameState.hardPoint;
 
         for (let i = hp.y; i < hp.y + hp.width; i++) {
             for (let j = hp.x; j < hp.x + hp.height; j++) {
-                gameMap[i][j] = 0;
+                this.gameMap[i][j] = 0;
             }
         }
     }

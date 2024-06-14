@@ -29,6 +29,9 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     align-items: center;
+
+    overflow-y: auto;
+    max-height: 80%;
 }
 
 #startMenu h1 {
@@ -106,6 +109,15 @@ body {
 }
 
 p {
+    font-size: 14px;
+    color: #fff;
+    line-height: 1.5;
+    margin-top: 20px;
+    text-align: center;
+    /* Center the text for instructions */
+}
+
+li {
     font-size: 14px;
     color: #fff;
     line-height: 1.5;

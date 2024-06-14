@@ -97,6 +97,7 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
 
+
     if (collided && bullet.owner !== player.id && bullet.team !== player.team) {
         player.health -= bullet.damage;
         if (player.health <= 0) {
@@ -105,6 +106,13 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
         return true;
     }
 
+    if(collided && bullet.owner !== player.id && bullet.team == player.team && gameState.players[bullet.owner].healRate != undefined){
+        player.health += gameState.players[bullet.owner].healRate;
+        if(player.health >= player.maxHealth){
+            player.health = player.maxHealth;
+        }
+        return true;
+    }
     return false;
 };
 

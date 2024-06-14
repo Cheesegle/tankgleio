@@ -3,9 +3,9 @@ class DamageNumber {
         this.x = x;
         this.y = y;
         this.value = value;
-        this.color = color(252, 3, 202); // Red color for damage numbers
-        this.fadeDuration = 500; // Milliseconds for fade out duration
-        this.timer = 1000; // Milliseconds to show the damage number
+        value<0 ? this.color = color(0, 153, 51) : this.color = color(252, 51, 1)
+        this.fadeDuration = 500; 
+        this.timer = 1000; 
     }
 
     update() {
@@ -19,7 +19,11 @@ class DamageNumber {
         fill(this.color);
         textSize(20);
         textAlign(CENTER);
-        text(`-${Math.round(this.value)}`, this.x, this.y);
+        if(this.value>=0){
+            text(`-${Math.round(this.value)}`, this.x, this.y);
+        }else{
+            text(`+${Math.abs(Math.round(this.value))}`, this.x, this.y);
+        }
         pop();
     }
 }

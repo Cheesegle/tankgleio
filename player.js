@@ -75,11 +75,29 @@ class Player {
                 this.shootCooldown = 600; // Balanced shooting speed
                 this.bulletSpeed = 25; // Faster bullets
                 this.bulletSize = 10;
-                this.bulletDamage = 80; // Moderate damage
-                this.regenRate = 3; // Higher regeneration rate
+                this.bulletDamage = 50; 
+                this.regenRate = 3;
                 this.bulletBounces = 2;
                 this.color = '#FFFFFF';
                 break;
+            case 'healer':
+                this.width = 43;
+                this.height = 33;
+                this.hitboxWidth = 38;
+                this.hitboxHeight = 38;
+                this.moveSpeed = 10;
+                this.maxHealth = 110;
+                this.mineCooldown = 5000;
+                this.shootCooldown = 700;
+                this.bulletSpeed = 18;
+                this.bulletSize = 10;
+                this.bulletDamage = 45;
+                this.regenRate = 4;
+                this.bulletBounces = 2;
+                this.healRate = 10; 
+                this.color = '#77B255';
+                break;
+
             case 'normal':
             default:
                 this.width = 43;

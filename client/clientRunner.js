@@ -316,6 +316,8 @@ function draw() {
 
                 if (player.health < prevState.players[playerId].health) {
                     createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
+                }else if(player.health > prevState.players[playerId].health+player.regenRate){
+                    createDamageNumber(player.x, player.y, prevState.players[playerId].health - player.health);
                 }
 
                 // Store player tracks
@@ -607,6 +609,9 @@ function updateTankInfo() {
         case 'speedy':
             info = 'A fast tank with lower durability. Bullets bounce twice.';
             break;
+        case 'healer':
+            info = 'A tank that has healing capabilities. Bullets bounce twice.';
+            break; 
         default:
             info = 'Select a tank type to see its description.';
     }

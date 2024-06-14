@@ -82,7 +82,7 @@ let gameState = {
     redTeamScore: 0,
     blueTeamScore: 0,
     roundTimeLeft: roundTime,
-    nextRotation: 10*60
+    nextRotation: 20*60
 };
 
 function truncateString(str, num) {
@@ -271,7 +271,7 @@ function newRound(killEveryone=true) {
         redTeamScore: 0,
         blueTeamScore: 0,
         roundTimeLeft: roundTime,
-        nextRotation: 10*60
+        nextRotation: 20*60
     };
 
     if(killEveryone) io.emit('dead');

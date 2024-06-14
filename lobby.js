@@ -29,6 +29,7 @@ class Lobby {
         };
         this.tileSize = 50;
         this.tickRate = tickRate;
+        this.tickTime = 1000 / tickRate
         this.players = {};
         this.movementQueue = {};
         this.lastShotTimes = {};
@@ -254,12 +255,12 @@ class Lobby {
             }
             if (!player.dead) {
                 if (this.isPlayerOnHardPoint(player)) {
-                    player.score += this.tickRate / 50;
+                    player.score += this.tickTime / 1000;
 
                     if (player.team === 'red') {
-                        this.gameState.redTeamScore += this.tickRate / 50;
+                        this.gameState.redTeamScore += this.tickTime / 1000;
                     } else {
-                        this.gameState.blueTeamScore += this.tickRate / 50;
+                        this.gameState.blueTeamScore += this.tickTime / 1000;
                     }
                 }
 
@@ -298,7 +299,8 @@ class Lobby {
     isPlayerOnHardPoint(player) {
         const tileX = Math.floor((player.x + player.width / 2) / this.tileSize);
         const tileY = Math.floor((player.y + player.height / 2) / this.tileSize);
-        if (this.gameMap[tileY][tileX]) {
+        ''
+        if (this.gameMap[tileY] && this.gameMap[tileY][tileX]) {
             return this.gameMap[tileY][tileX] === 2;
         } else {
             return false;

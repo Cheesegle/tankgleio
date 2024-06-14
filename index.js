@@ -14,7 +14,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const tickRate = 20;
-const tickTime = 1000/tickRate
+const tickTime = 1000 / tickRate
 
 var roundTime = tickRate * 60 * 4;
 
@@ -140,7 +140,7 @@ io.on('connection', (socket) => {
         if (!gameState.players[socket.id]) {
             let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
             gameState.players[socket.id] = newPlayer;
-        } else if (gameState.players[socket.id].dead === true && gameState.players[socket.id].spawnCooldown  === 0) {
+        } else if (gameState.players[socket.id].dead === true && gameState.players[socket.id].spawnCooldown === 0) {
             let player = gameState.players[socket.id];
             gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score)
         } else {

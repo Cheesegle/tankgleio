@@ -86,15 +86,8 @@ function createLobby() {
 }
 
 function joinLobby(lobbyId) {
-    socket.emit('joinLobby', lobbyId, (success) => {
-        if (success) {
-            // Enable the start game button
-            document.getElementById('startButton').disabled = false;
-        } else {
-            // Handle failure to join lobby (optional)
-            console.log(`Failed to join lobby ${lobbyId}`);
-        }
-    });
+    socket.emit('joinLobby', lobbyId);
+    document.getElementById('startButton').disabled = false;
 }
 
 socket.on('lobbyCreated', (lobbyId) => {

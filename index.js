@@ -20,8 +20,13 @@ function createLobby() {
     return lobbyId;
 }
 
-function joinLobby(socket, lobbyId, prevLobby) {
-    const lobby = lobbies[lobbyId];
+function joinLobby(socket, lobbyId) {
+    for (let lobbyId2 in lobbies) {
+         let lobby = lobbies[lobbyId2];
+         lobby.handleDisconnection(socket.id);
+         socket.leave(lobbyId2);
+    }
+    let lobby = lobbies[lobbyId];
     if (lobby) {
         socket.join(lobbyId);
         lobby.handleConnection(socket);
@@ -31,24 +36,17 @@ function joinLobby(socket, lobbyId, prevLobby) {
 }
 
 io.on('connection', (socket) => {
-    let prevLobby;
-
     socket.on('createLobby', () => {
-        const lobbyId = createLobby();
+        let lobbyId = createLobby();
         socket.emit('lobbyCreated', lobbyId);
     });
 
     socket.on('joinLobby', (lobbyId) => {
-        if (prevLobby && lobbies[prevLobby]) {
-            lobbies[prevLobby].handleDisconnection(socket.id);
-            socket.leave(prevLobby);
-        }
-        prevLobby = lobbyId;
         joinLobby(socket, lobbyId);
     });
 
     socket.on('listLobbies', () => {
-        const lobbyList = Object.keys(lobbies).map(lobbyId => ({
+        let lobbyList = Object.keys(lobbies).map(lobbyId => ({
             id: lobbyId,
             players: lobbies[lobbyId].getPlayerCount(),
             maxPlayers: lobbies[lobbyId].maxPlayers

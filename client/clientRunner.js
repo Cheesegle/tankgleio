@@ -102,16 +102,6 @@ socket.on('lobbyCreated', (lobbyId) => {
     requestLobbyList();
 });
 
-socket.on('disconnect', function() {
-    gameState = null;
-    prevState = null;
-    lastTick = null;
-    lastTickDiff = null;
-    tiles = [];
-
-    socket.socket.reconnect();
-})
-
 socket.on('lobbyList', (lobbyList) => {
     const lobbyListElement = document.getElementById('lobbyList');
     lobbyListElement.innerHTML = ''; // Clear existing list

@@ -1,11 +1,6 @@
 const SAT = require('sat');
 const rbush = require('rbush');
 
-let tileIndex = new rbush();
-let bulletIndex = new rbush();
-let playerIndex = new rbush();
-let mineIndex = new rbush();
-
 const lerp = (start, end, amount) => (1 - amount) * start + amount * end;
 
 const rLerp = (A, B, w) => {
@@ -27,7 +22,7 @@ const checkPlayerTileCollision = (player, tile) => {
     }
 };
 
-const updateMovement = (gameState, movementQueue, gameMap, tileSize) => {
+const updateMovement = (gameState, movementQueue, gameMap, tileSize, tileIndex) => {
     for (const playerId in movementQueue) {
         const playerMovement = movementQueue[playerId];
         let player = gameState.players[playerId];
@@ -97,7 +92,6 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
     const response = new SAT.Response();
     const collided = SAT.testCirclePolygon(bulletCircle, playerRect, response);
 
-
     if (collided && bullet.owner !== player.id && bullet.team !== player.team) {
         player.health -= bullet.damage;
         if (player.health <= 0) {
@@ -106,9 +100,9 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
         return true;
     }
 
-    if(collided && bullet.owner !== player.id && bullet.team == player.team && gameState.players[bullet.owner].healRate != undefined){
+    if (collided && bullet.owner !== player.id && bullet.team == player.team && gameState.players[bullet.owner].healRate != undefined) {
         player.health += gameState.players[bullet.owner].healRate;
-        if(player.health >= player.maxHealth){
+        if (player.health >= player.maxHealth) {
             player.health = player.maxHealth;
         }
         return true;
@@ -116,8 +110,8 @@ const checkBulletPlayerCollision = (bullet, player, gameState) => {
     return false;
 };
 
-const initMap = (gameMap, tileSize) => {
-    tileIndex = new rbush();
+const initMap = (gameMap, tileSize, tileIndex) => {
+    tileIndex.clear();
     // Populate the spatial index with tile data
     for (let i = 0; i < gameMap.length; i++) {
         for (let j = 0; j < gameMap[i].length; j++) {
@@ -141,7 +135,7 @@ const initMap = (gameMap, tileSize) => {
 }
 
 // Function to check bullet collision with nearby tiles using rbush
-const checkBulletMapCollision = (bullet, gameMap) => {
+const checkBulletMapCollision = (bullet, gameMap, tileIndex) => {
     const nearbyTiles = tileIndex.search({
         minX: bullet.x - bullet.size / 2,
         minY: bullet.y - bullet.size / 2,
@@ -193,7 +187,7 @@ const checkBulletMineCollision = (bullet, mine) => {
 };
 
 // Update bullets function using rbush for collision detection
-const updateBullets = (gameState, gameMap, tileSize, io) => {
+const updateBullets = (gameState, gameMap, tileSize, io, tileIndex, bulletIndex, playerIndex, mineIndex) => {
     bulletIndex.clear();
     playerIndex.clear();
     mineIndex.clear();
@@ -255,7 +249,7 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
             if (bullet.deleted) break;
 
             // Check collision with nearby tiles using rbush
-            if (checkBulletMapCollision(bullet, gameMap)) {
+            if (checkBulletMapCollision(bullet, gameMap, tileIndex)) {
                 if (bullet.bounces <= 0) {
                     bulletsToDelete.add(bulletId);
                     bullet.deleted = true;
@@ -345,8 +339,6 @@ const updateBullets = (gameState, gameMap, tileSize, io) => {
         delete gameState.bullets[bulletId];
     });
 };
-
-
 
 const updateMines = (gameState, io) => {
     for (const mineId in gameState.mines) {

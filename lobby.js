@@ -1,3 +1,5 @@
+const rbush = require('rbush');
+
 const { updateMovement, updateBullets, initMap, updateMines } = require('./gameLogic');
 const { generateMap } = require('./mapGenerator');
 const Player = require('./player');
@@ -35,6 +37,11 @@ class Lobby {
         this.lastShotTimes = {};
         this.lastMineTimes = {};
         this.emptytime = 0;
+        this.tileIndex = new rbush();
+        this.bulletIndex = new rbush();
+        this.playerIndex = new rbush();
+        this.mineIndex = new rbush();
+
     }
 
     getPlayerCount() {
@@ -243,9 +250,9 @@ class Lobby {
 
         updateMines(this.gameState, this.io)
 
-        updateBullets(this.gameState, this.gameMap, this.tileSize, this.io)
+        updateBullets(this.gameState, this.gameMap, this.tileSize, this.io, this.tileIndex, this.bulletIndex, this.playerIndex, this.mineIndex)
 
-        updateMovement(this.gameState, this.movementQueue, this.gameMap, this.tileSize);
+        updateMovement(this.gameState, this.movementQueue, this.gameMap, this.tileSize, this.tileIndex);
 
 
         for (const playerId in this.gameState.players) {
@@ -278,7 +285,7 @@ class Lobby {
 
     newRound(KILL = true) {
         this.gameMap = generateMap(50, 50, 10, 0.5);
-        initMap(this.gameMap, this.tileSize);
+        initMap(this.gameMap, this.tileSize, this.tileIndex);
 
         this.gameState = {
             players: {},

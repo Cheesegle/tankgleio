@@ -1,5 +1,4 @@
 const SAT = require('sat');
-const rbush = require('rbush');
 
 const lerp = (start, end, amount) => (1 - amount) * start + amount * end;
 

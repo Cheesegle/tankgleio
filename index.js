@@ -14,8 +14,8 @@ app.use(express.static(path.join(__dirname, 'client')));
 const lobbies = {};
 
 function createLobby() {
-    const lobbyId = uuidv4();
-    const lobby = new Lobby(io, tickRate, lobbyId);
+    let lobbyId = uuidv4();
+    let lobby = new Lobby(io, tickRate);
     lobbies[lobbyId] = lobby;
     return lobbyId;
 }
@@ -25,6 +25,8 @@ function joinLobby(socket, lobbyId, prevLobby) {
     if (lobby) {
         socket.join(lobbyId);
         lobby.handleConnection(socket);
+    } else {
+        socket.emit('error', 'Lobby does not exist');
     }
 }
 
@@ -37,11 +39,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('joinLobby', (lobbyId) => {
-        if (prevLobby) {
-            if (lobbies[prevLobby]) {
-                lobbies[prevLobby].handleDisconnection(socket.id);
-                socket.leave(prevLobby);
-            }
+        if (prevLobby && lobbies[prevLobby]) {
+            lobbies[prevLobby].handleDisconnection(socket.id);
+            socket.leave(prevLobby);
         }
         prevLobby = lobbyId;
         joinLobby(socket, lobbyId);
@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
         const lobbyList = Object.keys(lobbies).map(lobbyId => ({
             id: lobbyId,
             players: lobbies[lobbyId].getPlayerCount(),
-            maxPlayers: 999
+            maxPlayers: lobbies[lobbyId].maxPlayers
         }));
         socket.emit('lobbyList', lobbyList);
     });
@@ -62,12 +62,13 @@ const tickTime = 1000 / tickRate;
 
 setInterval(() => {
     for (const lobbyId in lobbies) {
-        let lobby = lobbies[lobbyId];
+        const lobby = lobbies[lobbyId];
         if (lobby.emptytime > tickRate * 5 && lobby.getPlayerCount() === 0) {
             delete lobbies[lobbyId];
+        } else {
+            lobby.update();
+            io.to(lobbyId).emit('state', lobby.gameState);
         }
-        lobby.update();
-        io.to(lobbyId).emit('state', lobby.gameState);
     }
 }, tickTime);
 

@@ -32,7 +32,6 @@ class Lobby {
         this.tileSize = 50;
         this.tickRate = tickRate;
         this.tickTime = 1000 / tickRate
-        this.players = {};
         this.movementQueue = {};
         this.lastShotTimes = {};
         this.lastMineTimes = {};
@@ -41,6 +40,7 @@ class Lobby {
         this.bulletIndex = new rbush();
         this.playerIndex = new rbush();
         this.mineIndex = new rbush();
+        this.maxPlayers = 999;
 
     }
 
@@ -81,11 +81,9 @@ class Lobby {
         if (!this.gameState.players[socket.id]) {
             let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
             this.gameState.players[socket.id] = newPlayer;
-            this.players[socket.id] = socket;
         } else if (this.gameState.players[socket.id].dead === true && this.gameState.players[socket.id].spawnCooldown === 0) {
             let player = this.gameState.players[socket.id];
             this.gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score);
-            this.players[socket.id] = socket;
         } else {
             //not supposed to happen!!!
         }
@@ -248,9 +246,9 @@ class Lobby {
             this.gameState.nextRotation = this.tickRate * 60;
         }
 
-        updateMines(this.gameState, this.io)
+        updateMines(this.gameState, this.io);
 
-        updateBullets(this.gameState, this.gameMap, this.tileSize, this.io, this.tileIndex, this.bulletIndex, this.playerIndex, this.mineIndex)
+        updateBullets(this.gameState, this.gameMap, this.tileSize, this.io, this.tileIndex, this.bulletIndex, this.playerIndex, this.mineIndex);
 
         updateMovement(this.gameState, this.movementQueue, this.gameMap, this.tileSize, this.tileIndex);
 

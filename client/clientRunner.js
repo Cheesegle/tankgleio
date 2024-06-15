@@ -100,8 +100,17 @@ function joinLobby(lobbyId) {
 
 socket.on('lobbyCreated', (lobbyId) => {
     requestLobbyList();
-    joinLobby(lobbyId);
 });
+
+socket.on('disconnect', function() {
+    gameState = null;
+    prevState = null;
+    lastTick = null;
+    lastTickDiff = null;
+    tiles = [];
+
+    socket.socket.reconnect();
+})
 
 socket.on('lobbyList', (lobbyList) => {
     const lobbyListElement = document.getElementById('lobbyList');

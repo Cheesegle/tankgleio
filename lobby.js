@@ -239,7 +239,7 @@ class Lobby {
         this.gameState.roundTimeLeft--;
         this.gameState.nextRotation--;
         if (this.gameState.roundTimeLeft <= 0) {
-            this.snewRound();
+            this.newRound();
         }
 
         if (this.gameState.nextRotation <= 0) {

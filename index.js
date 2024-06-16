@@ -77,6 +77,12 @@ setInterval(() => {
         const lobby = lobbies[lobbyId];
         if (lobby.emptytime > tickRate * 5 && lobby.getPlayerCount() === 0) {
             delete lobbies[lobbyId];
+            let lobbyList = Object.keys(lobbies).map(lobbyId => ({
+                id: lobbyId,
+                players: lobbies[lobbyId].getPlayerCount(),
+                maxPlayers: lobbies[lobbyId].maxPlayers
+            }));
+            io.emit('lobbyList', lobbyList);
         } else {
             lobby.update();
             io.to(lobbyId).emit('state', lobby.gameState);

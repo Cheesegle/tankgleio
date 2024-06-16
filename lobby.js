@@ -67,7 +67,7 @@ class Lobby {
 
     handleDisconnection(socketId) {
         if(this.owner == socketId && this.getPlayerCount() > 0){
-            const pList = Object.keys(gameState.players);
+            const pList = Object.keys(this.gameState.players);
             const newOwner = pList[Math.floor(Math.random()*pList.length)];
 
             this.owner = newOwner;

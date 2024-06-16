@@ -51,10 +51,11 @@ class Lobby {
     handleConnection(socket) {
         // Assign a team to the new player
         let team = Math.random() < 0.5 ? 'red' : 'blue';
+        socket.team = team;
         socket.emit('team', team);
 
         // Handle player spawn and movement
-        socket.on('spawn', (data) => this.handleSpawn(socket, data, team));
+        socket.on('spawn', (data) => this.handleSpawn(socket, data));
         socket.on('playerMovement', (playerMovement) => this.handlePlayerMovement(socket.id, playerMovement));
         socket.on('shoot', () => this.handleShoot(socket.id));
         socket.on('layMine', () => this.handleLayMine(socket.id));
@@ -69,7 +70,7 @@ class Lobby {
         delete this.movementQueue[socketId];
     }
 
-    handleSpawn(socket, data, team) {
+    handleSpawn(socket, data) {
         if (!data || !data.username) return;
         socket.emit('mapUpdate', this.gameMap);
         let spawnLocation = this.getRandomEmptyLocation(0, this.gameMap.length);
@@ -79,11 +80,11 @@ class Lobby {
         }
 
         if (!this.gameState.players[socket.id]) {
-            let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team);
+            let newPlayer = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, socket.team);
             this.gameState.players[socket.id] = newPlayer;
         } else if (this.gameState.players[socket.id].dead === true && this.gameState.players[socket.id].spawnCooldown === 0) {
             let player = this.gameState.players[socket.id];
-            this.gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, team, player.score);
+            this.gameState.players[socket.id] = new Player(spawnLocation.x, spawnLocation.y, 0, 0, socket.id, truncateString(data.username, 30), data.tankType, socket.team, player.score);
         } else {
             //not supposed to happen!!!
         }
@@ -148,8 +149,16 @@ class Lobby {
     }
 
     handleSwitchTeam(socket) {
-        let team = socket.team === 'blue' ? 'red' : 'blue';
-        socket.emit('team', team);
+        let currentTeam = socket.team;
+        let newTeam = currentTeam === 'blue' ? 'red' : 'blue';
+
+        socket.team = newTeam;
+
+        if (this.gameState.players[socket.id]) {
+            this.gameState.players[socket.id].team = newTeam;
+        }
+
+        socket.emit('team', newTeam);
     }
 
     handleEsc(socketId) {
@@ -233,8 +242,8 @@ class Lobby {
     update() {
         if (this.getPlayerCount() === 0) {
             this.emptytime++;
-        }else{
-            this.emptytime>0?this.emptytime--:this.emptytime=0;
+        } else {
+            this.emptytime > 0 ? this.emptytime-- : this.emptytime = 0;
         }
         this.gameState.roundTimeLeft--;
         this.gameState.nextRotation--;

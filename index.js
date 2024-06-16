@@ -75,7 +75,7 @@ const tickTime = 1000 / tickRate;
 setInterval(() => {
     for (const lobbyId in lobbies) {
         const lobby = lobbies[lobbyId];
-        if (lobby.emptytime > tickRate * 5 && lobby.getPlayerCount() === 0) {
+        if (lobby.emptytime > tickRate * 10 && lobby.getPlayerCount() === 0) {
             delete lobbies[lobbyId];
             let lobbyList = Object.keys(lobbies).map(lobbyId => ({
                 id: lobbyId,

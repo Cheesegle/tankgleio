@@ -13,11 +13,20 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 const lobbies = {};
 
-function createLobby() {
+function createLobby(socketId) {
     let lobbyId = uuidv4();
-    let lobby = new Lobby(io, tickRate);
+    let lobby = new Lobby(io, tickRate, socketId);
     lobbies[lobbyId] = lobby;
     return lobbyId;
+}
+
+function checkOwner(socketId) {
+    for (let lobbyId in lobbies) {
+        if (lobbies[lobbyId].owner === socketId) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function joinLobby(socket, lobbyId) {
@@ -37,8 +46,13 @@ function joinLobby(socket, lobbyId) {
 
 io.on('connection', (socket) => {
     socket.on('createLobby', () => {
-        let lobbyId = createLobby();
-        socket.emit('lobbyCreated', lobbyId);
+        if(!checkOwner(socket.id)){
+            let lobbyId = createLobby(socket.id);
+            socket.emit('lobbyCreated', lobbyId);
+        }else{
+            socket.emit('alert', "You are already the owner of a lobby.");
+        }
+
     });
 
     socket.on('joinLobby', (lobbyId) => {

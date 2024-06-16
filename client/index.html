@@ -27,16 +27,7 @@
         <br>
         <button id="switchTeamButton" onclick="switchTeam()">Switch Team</button>
         <br>
-        <div id="lobbyMenu">
-            <button onclick="createLobby()">Create New Lobby</button>
-        </div>
-        <!-- Lobby list -->
-        <div id="lobbyList">
-            <h3>Available Lobbies (click to join)</h3>
-            <ul id="lobbyUl">
-                <!-- List of lobbies will be dynamically added here -->
-            </ul>
-        </div>
+        
         <p>
             OBJECTIVE:<br>
             Control the hardpoint(yellow square)<br>
@@ -48,6 +39,16 @@
             ESC: back to menu
         </p>
     </div>
+    <!-- Lobby Sidebar -->
+    <div id="lobbyList">
+        <h3>Available Lobbies (click to join)</h3>
+        <ul id="lobbyUl">
+            <!-- List of lobbies will be dynamically added here -->
+        </ul>
+        <div id="lobbyMenu">
+            <button id="createLobbyButton" onclick="createLobby()">Create New Lobby</button>
+        </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
@@ -58,6 +59,7 @@
     <script src="/clientHardpoint.js"></script>
     <script src="/clientTank.js"></script>
     <script src="/clientController.js"></script>
+    <script src="script.js"></script> <!-- Add this line to include your JS file -->
 </body>
 
 </html>

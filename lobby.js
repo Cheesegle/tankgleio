@@ -16,7 +16,7 @@ function truncateString(str, num) {
 }
 
 class Lobby {
-    constructor(io, tickRate) {
+    constructor(io, tickRate, socketId) {
         this.io = io;
         this.gameMap = generateMap(50, 50, 10, 0.5);
         this.gameState = {
@@ -41,7 +41,7 @@ class Lobby {
         this.playerIndex = new rbush();
         this.mineIndex = new rbush();
         this.maxPlayers = 999;
-
+        this.owner = socketId;
     }
 
     getPlayerCount() {
@@ -233,6 +233,8 @@ class Lobby {
     update() {
         if (this.getPlayerCount() === 0) {
             this.emptytime++;
+        }else{
+            this.emptytime>0?this.emptytime--:this.emptytime=0;
         }
         this.gameState.roundTimeLeft--;
         this.gameState.nextRotation--;

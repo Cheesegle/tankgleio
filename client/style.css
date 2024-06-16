@@ -29,7 +29,6 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     align-items: center;
-
     overflow-y: auto;
     max-height: 80%;
 }
@@ -41,7 +40,8 @@ body {
 }
 
 #startMenu input,
-#startMenu button {
+#startMenu button,
+#lobbyMenu button {
     display: block;
     width: 92%;
     margin: 10px 0;
@@ -54,7 +54,6 @@ body {
 
 #startMenu input {
     border: 2px solid #ccc;
-
 }
 
 #startMenu button {
@@ -124,4 +123,42 @@ li {
     margin-top: 20px;
     text-align: center;
     /* Center the text for instructions */
+}
+
+/* Sidebar Styles */
+#lobbyList {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+#lobbyList h3 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#lobbyUl {
+    list-style: none;
+    padding: 0;
+}
+
+#lobbyUl li {
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#lobbyUl li:hover {
+    background-color: #555;
 }

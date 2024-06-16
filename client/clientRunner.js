@@ -104,14 +104,15 @@ socket.on('lobbyCreated', (lobbyId) => {
 
 socket.on('lobbyList', (lobbyList) => {
     const lobbyListElement = document.getElementById('lobbyList');
-    lobbyListElement.innerHTML = ''; // Clear existing list
+    const lobbyUlElement = document.getElementById('lobbyUl');
+    lobbyUlElement.innerHTML = ''; // Clear existing list
 
     lobbyList.forEach((lobby) => {
         const listItem = document.createElement('li');
         listItem.textContent = `Lobby ID: ${lobby.id} - Players: ${lobby.players}/${lobby.maxPlayers}`;
         listItem.addEventListener('click', () => joinLobby(lobby.id)); // Add click event to join lobby
         listItem.style.cursor = 'pointer'; // Change cursor to pointer on hover
-        lobbyListElement.appendChild(listItem);
+        lobbyUlElement.appendChild(listItem);
     });
 });
 
@@ -123,6 +124,7 @@ function setup() {
 
     // Show the start menu
     document.getElementById('startMenu').style.display = 'block';
+    document.getElementById('lobbyList').style.display = 'block';
 
     requestLobbyList();
 
@@ -167,7 +169,8 @@ function setup() {
     });
 
     socket.on('dead', (state) => {
-        document.getElementById('startMenu').style.display = 'block';;
+        document.getElementById('startMenu').style.display = 'block';
+        document.getElementById('lobbyList').style.display = 'block';
     });
 
     // Listen to the server and draw the players
@@ -179,6 +182,10 @@ function setup() {
             gameState = state;
         }
     });
+
+    socket.on('alert', (msg) => {
+        alert(msg);
+    })
 }
 
 function startGame() {
@@ -197,6 +204,7 @@ function startGame() {
 
     // Hide the start menu
     document.getElementById('startMenu').style.display = 'none';
+    document.getElementById('lobbyList').style.display = 'none';
 
     // Join the game with the username
     socket.emit('spawn', {

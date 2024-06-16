@@ -65,6 +65,12 @@ class Lobby {
     }
 
     handleDisconnection(socketId) {
+        if(this.owner == socketId && this.getPlayerCount() > 0){
+            const pList = Object.keys(gameState.players);
+            const newOwner = pList[Math.floor(Math.random()*pList.length)];
+
+            this.owner = newOwner;
+        }
         delete this.gameState.players[socketId];
         delete this.movementQueue[socketId];
     }
